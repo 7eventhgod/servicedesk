@@ -24,7 +24,7 @@ export async function GET(
     }
 
     // Try to find attachment in regular tickets
-    let attachment = await prisma.attachment.findUnique({
+    let attachment: any = await prisma.attachment.findUnique({
       where: { id: params.id },
       include: { ticket: true },
     });
@@ -42,7 +42,7 @@ export async function GET(
         return NextResponse.json({ error: "Attachment not found" }, { status: 404 });
       }
 
-      attachment = supportAttachment as any;
+      attachment = supportAttachment;
       isSupportTicket = true;
     }
 
@@ -108,7 +108,7 @@ export async function DELETE(
     }
 
     // Try to find attachment in regular tickets
-    let attachment = await prisma.attachment.findUnique({
+    let attachment: any = await prisma.attachment.findUnique({
       where: { id: params.id },
       include: { ticket: true },
     });
@@ -126,7 +126,7 @@ export async function DELETE(
         return NextResponse.json({ error: "Attachment not found" }, { status: 404 });
       }
 
-      attachment = supportAttachment as any;
+      attachment = supportAttachment;
       isSupportTicket = true;
     }
 

@@ -17,12 +17,13 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // ====== FOR SUPER-ADMIN (ADMIN) ======
-    if (session.user.role === "ADMIN") {
+    // ====== FOR SUPER-ADMIN (ADMIN without tenantId) ======
+    if (session.user.role === "ADMIN" && !session.user.tenantId) {
       // Get all support tickets with comments (not from super-admin themselves)
       const tickets = await prisma.supportTicket.findMany({
         select: {
           id: true,
+          createdAt: true,
           lastViewedByAdminAt: true,
           creatorId: true,
           comments: {
@@ -44,25 +45,27 @@ export async function GET() {
         },
       });
 
-      // Count the NUMBER of unread comments
+      // Count the NUMBER of unread items (new tickets + new comments)
       let unreadCount = 0;
       for (const ticket of tickets) {
-        if (ticket.comments.length === 0) continue;
-        
-        // If super-admin never opened ticket - all comments are unread
+        // If super-admin never opened ticket - count ticket as unread + all comments
         if (!ticket.lastViewedByAdminAt) {
+          // Count this ticket as unread
+          unreadCount += 1;
+          // Count all comments as unread
           unreadCount += ticket.comments.length;
           continue;
         }
         
-        // Count comments newer than lastViewedByAdminAt
-        const newComments = ticket.comments.filter(
-          (comment) => comment.createdAt > ticket.lastViewedByAdminAt!
-        );
-        unreadCount += newComments.length;
+        // Ticket was viewed - count only new comments created after lastViewedByAdminAt
+        if (ticket.comments.length > 0) {
+          const newComments = ticket.comments.filter(
+            (comment) => comment.createdAt > ticket.lastViewedByAdminAt!
+          );
+          unreadCount += newComments.length;
+        }
       }
 
-      console.log("📊 [ADMIN] Unread comments count:", unreadCount);
       return NextResponse.json({ count: unreadCount });
     }
 

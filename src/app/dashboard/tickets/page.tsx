@@ -3,10 +3,15 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { TicketList } from "@/components/tickets/ticket-list";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus } from "lucide-react";
 import { motion } from "framer-motion";
+import { useSession } from "next-auth/react";
 
 export default function TicketsPage() {
+  const { data: session } = useSession();
+  const isAgent = session?.user.role === "AGENT";
+
   return (
     <div className="space-y-6">
       <motion.div
@@ -20,15 +25,17 @@ export default function TicketsPage() {
             Tickets
           </h1>
           <p className="text-sm sm:text-base text-muted-foreground mt-1 sm:mt-2">
-            Manage requests and issues
+            {isAgent ? "Your assigned tickets and team tickets" : "Manage requests and issues"}
           </p>
         </div>
-        <Link href="/dashboard/tickets/new" className="w-full sm:w-auto">
-          <Button className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-300 touch-manipulation">
-            <Plus className="mr-2 h-4 w-4" />
-            <span className="sm:inline">Create Ticket</span>
-          </Button>
-        </Link>
+        {!isAgent && (
+          <Link href="/dashboard/tickets/new" className="w-full sm:w-auto">
+            <Button className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-300 touch-manipulation">
+              <Plus className="mr-2 h-4 w-4" />
+              <span className="sm:inline">Create Ticket</span>
+            </Button>
+          </Link>
+        )}
       </motion.div>
 
       <motion.div
@@ -36,7 +43,22 @@ export default function TicketsPage() {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 }}
       >
-        <TicketList />
+        {isAgent ? (
+          <Tabs defaultValue="assigned" className="space-y-4">
+            <TabsList>
+              <TabsTrigger value="assigned">My Tickets</TabsTrigger>
+              <TabsTrigger value="all">All Team Tickets</TabsTrigger>
+            </TabsList>
+            <TabsContent value="assigned">
+              <TicketList showAll={false} />
+            </TabsContent>
+            <TabsContent value="all">
+              <TicketList showAll={true} allowSelfAssign={true} />
+            </TabsContent>
+          </Tabs>
+        ) : (
+          <TicketList />
+        )}
       </motion.div>
     </div>
   );

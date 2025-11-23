@@ -40,15 +40,15 @@ export async function POST(
 
     const message = update.message;
     const chatId = message.chat.id;
-    const text = message.text;
+    const text = message.text!;
     const userId = message.from.id;
 
     // Save Telegram user if not exists
     await prisma.telegramUser.upsert({
       where: {
-        telegramId_botId: {
-          telegramId: userId.toString(),
+        botId_telegramId: {
           botId: bot.id,
+          telegramId: userId.toString(),
         },
       },
       create: {
@@ -56,14 +56,13 @@ export async function POST(
         botId: bot.id,
         firstName: message.from.first_name,
         lastName: message.from.last_name,
-        username: message.from.username,
-        chatId: chatId.toString(),
+        telegramUsername: message.from.username,
+        userId: "", // Placeholder, will be updated later
       },
       update: {
         firstName: message.from.first_name,
         lastName: message.from.last_name,
-        username: message.from.username,
-        chatId: chatId.toString(),
+        telegramUsername: message.from.username,
       },
     });
 
@@ -71,11 +70,11 @@ export async function POST(
     await prisma.telegramMessage.create({
       data: {
         botId: bot.id,
-        messageId: message.message_id.toString(),
-        chatId: chatId.toString(),
-        fromUserId: userId.toString(),
+        telegramMessageId: message.message_id.toString(),
+        telegramChatId: chatId.toString(),
         text: text,
         messageType: "text",
+        direction: "incoming",
       },
     });
 
@@ -133,7 +132,7 @@ async function handleCommand(
 
     case "/ticket":
       // Parse command: /ticket Title - Description
-      const ticketMatch = text.match(/^\/ticket\s+(.+?)\s+-\s+(.+)$/s);
+      const ticketMatch = text.match(/^\/ticket\s+(.+?)\s+-\s+(.+)$/);
       
       if (!ticketMatch) {
         await sendTelegramMessage(
@@ -150,20 +149,12 @@ async function handleCommand(
       // Check if Telegram is linked to user
       const telegramUser = await prisma.telegramUser.findFirst({
         where: {
-          telegramId: message.from.id.toString(),
           botId,
-        },
-        include: {
-          user: {
-            select: {
-              id: true,
-              tenantId: true,
-            },
-          },
+          telegramId: message.from.id.toString(),
         },
       });
 
-      if (!telegramUser?.userId) {
+      if (!telegramUser?.userId || telegramUser.userId === "") {
         await sendTelegramMessage(
           botToken,
           chatId,
@@ -173,9 +164,24 @@ async function handleCommand(
         break;
       }
 
+      // Get user to find tenant
+      const user = await prisma.user.findUnique({
+        where: { id: telegramUser.userId },
+        select: { tenantId: true },
+      });
+
+      if (!user?.tenantId) {
+        await sendTelegramMessage(
+          botToken,
+          chatId,
+          "❌ Error: organization not found."
+        );
+        break;
+      }
+
       // Get tenant for ticket number generation
       const tenant = await prisma.tenant.findUnique({
-        where: { id: telegramUser.user!.tenantId! },
+        where: { id: user.tenantId },
         select: { slug: true, name: true },
       });
 
@@ -190,9 +196,10 @@ async function handleCommand(
 
       // Generate ticket number
       const ticketCount = await prisma.ticket.count({
-        where: { tenantId: telegramUser.user!.tenantId! },
+        where: { tenantId: user.tenantId },
       });
-      const ticketNumber = `${tenant.slug.toUpperCase()}-${String(ticketCount + 1).padStart(3, "0")}`;
+      const ticketNumber = ticketCount + 1;
+      const ticketDisplayNumber = `${tenant.slug.toUpperCase()}-${String(ticketNumber).padStart(3, "0")}`;
 
       // Create ticket
       const newTicket = await prisma.ticket.create({
@@ -202,15 +209,15 @@ async function handleCommand(
           description: ticketDescription.trim(),
           status: "OPEN",
           priority: "MEDIUM",
-          tenantId: telegramUser.user!.tenantId!,
-          creatorId: telegramUser.user!.id,
+          tenantId: user.tenantId,
+          creatorId: telegramUser.userId,
         },
       });
 
       await sendTelegramMessage(
         botToken,
         chatId,
-        `✅ Ticket created successfully!\n\n*Number:* ${ticketNumber}\n*Title:* ${ticketTitle.trim()}\n*Status:* Open`,
+        `✅ Ticket created successfully!\n\n*Number:* ${ticketDisplayNumber}\n*Title:* ${ticketTitle.trim()}\n*Status:* Open`,
         { parse_mode: "Markdown" }
       );
 
@@ -224,7 +231,7 @@ async function handleCommand(
         await sendTelegramMessage(
           botToken,
           bot.groupChatId,
-          `🎫 *New Ticket: ${ticketNumber}*\n\n*Title:* ${ticketTitle.trim()}\n*Description:* ${ticketDescription.trim()}\n*Creator:* ${message.from.first_name}`,
+          `🎫 *New Ticket: ${ticketDisplayNumber}*\n\n*Title:* ${ticketTitle.trim()}\n*Description:* ${ticketDescription.trim()}\n*Creator:* ${message.from.first_name}`,
           { parse_mode: "Markdown" }
         );
       }
@@ -233,24 +240,21 @@ async function handleCommand(
     case "/link":
       const linkTelegramUser = await prisma.telegramUser.findFirst({
         where: {
-          telegramId: message.from.id.toString(),
           botId,
-        },
-        include: {
-          user: {
-            select: {
-              name: true,
-              email: true,
-            },
-          },
+          telegramId: message.from.id.toString(),
         },
       });
 
-      if (linkTelegramUser?.userId) {
+      if (linkTelegramUser?.userId && linkTelegramUser.userId !== "") {
+        const user = await prisma.user.findUnique({
+          where: { id: linkTelegramUser.userId },
+          select: { name: true, email: true },
+        });
+        
         await sendTelegramMessage(
           botToken,
           chatId,
-          `✅ Your Telegram is already linked to account:\n*${linkTelegramUser.user?.name}* (${linkTelegramUser.user?.email})`,
+          `✅ Your Telegram is already linked to account:\n*${user?.name}* (${user?.email})`,
           { parse_mode: "Markdown" }
         );
       } else {

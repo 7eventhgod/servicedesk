@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
-import { createAuditLog } from "@/lib/audit-log";
+import { createAuditLog, getClientIp, getUserAgent } from "@/lib/audit-log";
 import { getTenantWhereClause, getTenantIdForCreate } from "@/lib/api-utils";
 
 const ruleSchema = z.object({
@@ -76,7 +76,7 @@ export async function POST(request: Request) {
     const rule = await prisma.automationRule.create({
       data: {
         ...data,
-        ...getTenantWhereClause(session),
+        tenantId: session.user.tenantId,
       },
     });
 
@@ -88,7 +88,8 @@ export async function POST(request: Request) {
       resourceType: "AUTOMATION_RULE",
       resourceId: rule.id,
       metadata: { name: rule.name },
-      request,
+      ipAddress: getClientIp(request),
+      userAgent: getUserAgent(request),
     });
 
     return NextResponse.json(rule, { status: 201 });

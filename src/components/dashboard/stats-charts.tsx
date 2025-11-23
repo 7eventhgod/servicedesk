@@ -89,13 +89,13 @@ export function StatsCharts() {
     );
   }
 
-  // Prepare data for priority chart
+  // Prepare data for priority chart - filter out zero values
   const priorityData = [
     { name: "Low", value: stats.priorities.LOW, color: PRIORITY_COLORS.LOW },
     { name: "Medium", value: stats.priorities.MEDIUM, color: PRIORITY_COLORS.MEDIUM },
     { name: "High", value: stats.priorities.HIGH, color: PRIORITY_COLORS.HIGH },
     { name: "Urgent", value: stats.priorities.URGENT, color: PRIORITY_COLORS.URGENT },
-  ];
+  ].filter(item => item.value > 0); // Only show priorities that have tickets
 
   return (
     <div className="space-y-6">
@@ -252,25 +252,55 @@ export function StatsCharts() {
               <CardDescription>Number of tickets by priority level</CardDescription>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={priorityData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {priorityData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
+              {priorityData.length > 0 ? (
+                <>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                      <Pie
+                        data={priorityData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, value, percent }: any) => 
+                          `${name}\n${value} (${(percent * 100).toFixed(0)}%)`
+                        }
+                        outerRadius={100}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        {priorityData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip 
+                        formatter={(value: number, name: string) => [value, `${name} tickets`]}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  {/* Priority legend with exact counts */}
+                  <div className="mt-4 grid grid-cols-2 gap-2">
+                    {[
+                      { name: "Low", value: stats.priorities.LOW, color: PRIORITY_COLORS.LOW },
+                      { name: "Medium", value: stats.priorities.MEDIUM, color: PRIORITY_COLORS.MEDIUM },
+                      { name: "High", value: stats.priorities.HIGH, color: PRIORITY_COLORS.HIGH },
+                      { name: "Urgent", value: stats.priorities.URGENT, color: PRIORITY_COLORS.URGENT },
+                    ].map((priority) => (
+                      <div key={priority.name} className="flex items-center gap-2 text-sm">
+                        <div 
+                          className="w-4 h-4 rounded-full" 
+                          style={{ backgroundColor: priority.color }}
+                        />
+                        <span className="font-medium">{priority.name}:</span>
+                        <span className="text-muted-foreground">{priority.value}</span>
+                      </div>
                     ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
+                  </div>
+                </>
+              ) : (
+                <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                  <p>No tickets with priorities in the selected period</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </motion.div>

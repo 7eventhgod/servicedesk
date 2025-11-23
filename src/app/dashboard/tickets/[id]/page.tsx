@@ -315,7 +315,16 @@ export default function TicketDetailPage() {
                   <Textarea
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
-                    placeholder="Write a comment..."
+                    onKeyDown={(e) => {
+                      // Allow Shift+Enter for new line, Enter submits the form
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        if (comment.trim() && !isSubmitting) {
+                          handleAddComment(e);
+                        }
+                      }
+                    }}
+                    placeholder="Write a comment... Press Enter to send, Shift+Enter for new line."
                     disabled={isSubmitting}
                     rows={3}
                     className="text-xs sm:text-sm min-h-[60px] sm:min-h-[80px]"

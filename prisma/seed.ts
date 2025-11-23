@@ -30,11 +30,14 @@ async function main() {
   // Create demo organization (tenant)
   const tenant = await prisma.tenant.upsert({
     where: { slug: "demo" },
-    update: {},
+    update: {
+      isDemo: true, // Always update to ensure it's marked as demo
+    },
     create: {
       name: "Demo Company",
       slug: "demo",
       domain: "demo.com",
+      isDemo: true, // Mark as demo tenant
     },
   });
 

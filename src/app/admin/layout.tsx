@@ -2,7 +2,7 @@
 
 import { SessionProvider } from "next-auth/react";
 import { useState } from "react";
-import { DashboardSidebar } from "@/components/dashboard/sidebar";
+import { AdminSidebar } from "@/components/admin/admin-sidebar";
 import { DashboardHeader } from "@/components/dashboard/header";
 
 export default function AdminLayout({
@@ -14,17 +14,17 @@ export default function AdminLayout({
 
   return (
     <SessionProvider>
-      <div className="min-h-screen bg-slate-50">
+      <div className="min-h-screen bg-black">
         <DashboardHeader 
           onMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)} 
           mobileMenuOpen={mobileMenuOpen}
         />
-        <div className="flex">
-          <DashboardSidebar 
-            mobileMenuOpen={mobileMenuOpen} 
+        <div className="flex border-t border-neutral-900">
+          <AdminSidebar 
+            mobileMenuOpen={mobileMenuOpen}
             onClose={() => setMobileMenuOpen(false)}
           />
-          <main className="flex-1 p-3 sm:p-6 w-full overflow-x-hidden">
+          <main className="flex-1">
             {children}
           </main>
         </div>

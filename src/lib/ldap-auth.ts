@@ -156,7 +156,7 @@ async function tryLdapAuth(
           userFound = true;
           hasResolved = true;
 
-          const obj = entry.object as any;
+          const obj = entry.pojo as any;
           const userEmail = obj.mail || obj.userPrincipalName || email;
           const userName = obj.displayName || obj.cn || username;
 

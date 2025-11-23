@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Ticket, CheckCircle2, Clock, AlertCircle, TrendingUp, Users, Calendar, BarChart3, Download, HelpCircle } from "lucide-react";
+import { Ticket, CheckCircle2, Clock, AlertCircle, TrendingUp, Users, Calendar, BarChart3, Download, HelpCircle, Crown } from "lucide-react";
 import { motion } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StatsCharts } from "@/components/dashboard/stats-charts";
@@ -130,25 +130,38 @@ export default function DashboardPage() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 p-4 sm:p-6 md:p-8 text-white shadow-2xl"
+        className="relative overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 p-6 sm:p-8 md:p-10 text-white shadow-xl"
       >
-        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="absolute inset-0 bg-black/5"></div>
         <div className="relative z-10">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-1 sm:mb-2">
-            Welcome, {session?.user.name || "User"}! 👋
-          </h1>
-          <p className="text-sm sm:text-base md:text-lg text-white/90">
-            {new Date().toLocaleDateString("en-US", {
-              weekday: "long",
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
-          </p>
+          <div className="flex items-start justify-between">
+            <div>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-2 sm:mb-3">
+                Welcome back, {session?.user.name || "User"}! 👋
+              </h1>
+              <p className="text-base sm:text-lg md:text-xl text-white/90 font-light">
+                {new Date().toLocaleDateString("en-US", {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </p>
+            </div>
+            {isSuperAdmin && (
+              <Button
+                onClick={() => router.push("/admin")}
+                className="bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-sm shadow-lg"
+              >
+                <Crown className="h-4 w-4 mr-2" />
+                Admin Panel
+              </Button>
+            )}
+          </div>
         </div>
         {/* Decorative blobs - hidden on mobile */}
-        <div className="hidden sm:block absolute bottom-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mb-32 -mr-32"></div>
-        <div className="hidden sm:block absolute top-0 left-0 w-48 h-48 bg-white/10 rounded-full blur-3xl -mt-24 -ml-24"></div>
+        <div className="hidden sm:block absolute bottom-0 right-0 w-72 h-72 bg-white/10 rounded-full blur-3xl -mb-36 -mr-36"></div>
+        <div className="hidden sm:block absolute top-0 left-0 w-56 h-56 bg-white/10 rounded-full blur-3xl -mt-28 -ml-28"></div>
       </motion.div>
 
       {/* Tabs for Overview and Analytics - Responsive */}
@@ -254,7 +267,7 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent className="pb-4 sm:pb-6">
                 <p className="text-xs sm:text-sm text-muted-foreground">
-                  {isSuperAdmin ? "Manage all organizations" : (session?.user.tenant?.name || "Your organization")}
+                  {isSuperAdmin ? "Manage all organizations" : "Your organization"}
                 </p>
               </CardContent>
             </Card>

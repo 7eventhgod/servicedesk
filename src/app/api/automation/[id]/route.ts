@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
-import { createAuditLog } from "@/lib/audit-log";
+import { createAuditLog, getClientIp, getUserAgent } from "@/lib/audit-log";
 
 const updateRuleSchema = z.object({
   name: z.string().min(1).optional(),
@@ -97,7 +97,8 @@ export async function PATCH(
       resourceType: "AUTOMATION_RULE",
       resourceId: updatedRule.id,
       metadata: { name: updatedRule.name },
-      request,
+      ipAddress: getClientIp(request),
+      userAgent: getUserAgent(request),
     });
 
     return NextResponse.json(updatedRule);
@@ -148,7 +149,8 @@ export async function DELETE(
       resourceType: "AUTOMATION_RULE",
       resourceId: rule.id,
       metadata: { name: rule.name },
-      request,
+      ipAddress: getClientIp(request),
+      userAgent: getUserAgent(request),
     });
 
     return NextResponse.json({ success: true });

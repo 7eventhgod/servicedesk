@@ -120,6 +120,13 @@ const menuItems = [
     requiredModule: "ldap" as FeatureFlag, // SSO part of LDAP module
   },
   {
+    label: "AD Sync",
+    href: "/dashboard/settings/ad-sync",
+    icon: Shield,
+    roles: ["ADMIN", "TENANT_ADMIN"],
+    requiredModule: "ldap" as FeatureFlag, // AD Sync part of LDAP module
+  },
+  {
     label: "Telegram",
     href: "/dashboard/settings/telegram",
     icon: MessageCircle,
@@ -198,10 +205,15 @@ export function DashboardSidebar({ mobileMenuOpen = false, onClose }: DashboardS
   const [ticketUnreadCount, setTicketUnreadCount] = useState(0); // Regular tickets (for all)
   const [shouldBounceSuppport, setShouldBounceSupport] = useState(false);
   const [shouldBounceTicket, setShouldBounceTicket] = useState(false);
+  
+  const isAdmin = session?.user.role === "ADMIN" && !session?.user.tenantId;
 
   // Function to fetch support ticket counter (for TENANT_ADMIN and ADMIN)
   const fetchSupportUnreadCount = () => {
-    if (session?.user.role === "TENANT_ADMIN" || session?.user.role === "ADMIN") {
+    const isTenantAdmin = session?.user.role === "TENANT_ADMIN";
+    const isSuperAdmin = session?.user.role === "ADMIN" && !session?.user.tenantId;
+    
+    if (isTenantAdmin || isSuperAdmin) {
       fetch("/api/support-tickets/unread-count")
         .then((res) => res.json())
         .then((data) => {
@@ -255,7 +267,10 @@ export function DashboardSidebar({ mobileMenuOpen = false, onClose }: DashboardS
 
   // Initial load and polling of support tickets (for TENANT_ADMIN and ADMIN)
   useEffect(() => {
-    if (session?.user.role === "TENANT_ADMIN" || session?.user.role === "ADMIN") {
+    const isTenantAdmin = session?.user.role === "TENANT_ADMIN";
+    const isSuperAdmin = session?.user.role === "ADMIN" && !session?.user.tenantId;
+    
+    if (isTenantAdmin || isSuperAdmin) {
       fetchSupportUnreadCount();
       const interval = setInterval(fetchSupportUnreadCount, 10000);
       return () => clearInterval(interval);
@@ -300,9 +315,9 @@ export function DashboardSidebar({ mobileMenuOpen = false, onClose }: DashboardS
       return false;
     }
 
-    // Admin panel only for global ADMIN (without tenantId)
+    // Filter out all superAdmin items - they are now in admin panel only
     if (item.superAdmin) {
-      return session?.user.role === "ADMIN" && !session?.user.tenantId;
+      return false;
     }
 
     // Billing available only for TENANT_ADMIN with tenantId
@@ -343,8 +358,8 @@ export function DashboardSidebar({ mobileMenuOpen = false, onClose }: DashboardS
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden lg:block w-64 border-r bg-white min-h-[calc(100vh-4rem)]">
-        <nav className="p-4 space-y-2">
+      <aside className="hidden lg:block w-56 border-r border-slate-200 dark:border-slate-900 min-h-[calc(100vh-4rem)] bg-white dark:bg-slate-950">
+        <nav className="p-3 space-y-1">
           {filteredMenuItems.map((item) => {
             const Icon = item.icon;
             const href = getItemHref(item);
@@ -355,24 +370,26 @@ export function DashboardSidebar({ mobileMenuOpen = false, onClose }: DashboardS
                 key={href}
                 href={href}
                 className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors relative",
+                  "flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-150 relative group",
                   isActive
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                    ? "bg-primary/10 text-primary font-semibold shadow-sm"
+                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900/50 font-normal"
                 )}
               >
-                <Icon className="h-5 w-5" />
-                <span className="font-medium">{item.label}</span>
+                <Icon className={cn(
+                  "h-4 w-4 transition-transform duration-150",
+                  isActive ? "text-primary" : "group-hover:scale-110"
+                )} />
+                <span className="text-sm">{item.label}</span>
                 
                 {/* Badge for unread regular tickets */}
                 {item.href === "/dashboard/tickets" && ticketUnreadCount > 0 && (
                   <span 
                     key={`ticket-badge-${ticketUnreadCount}`}
                     className={cn(
-                      "ml-auto flex items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-xs font-bold text-white shadow-lg ring-2 ring-blue-300 ring-offset-1 transition-all duration-300",
-                      ticketUnreadCount > 9 ? "h-6 w-7 px-1" : "h-6 w-6",
-                      shouldBounceTicket ? "animate-notification-bounce" : "animate-pulse",
-                      "hover:scale-110 hover:shadow-xl"
+                      "ml-auto flex items-center justify-center rounded-full bg-primary text-primary-foreground text-[11px] font-bold px-2 h-5 min-w-[20px] shadow-sm",
+                      ticketUnreadCount > 9 ? "min-w-[24px]" : "",
+                      shouldBounceTicket ? "animate-notification-bounce" : ""
                     )}
                   >
                     {ticketUnreadCount > 99 ? "99+" : ticketUnreadCount}
@@ -384,10 +401,9 @@ export function DashboardSidebar({ mobileMenuOpen = false, onClose }: DashboardS
                   <span 
                     key={`support-badge-${supportUnreadCount}`}
                     className={cn(
-                      "ml-auto flex items-center justify-center rounded-full bg-gradient-to-br from-red-500 to-red-600 text-xs font-bold text-white shadow-lg ring-2 ring-red-300 ring-offset-1 transition-all duration-300",
-                      supportUnreadCount > 9 ? "h-6 w-7 px-1" : "h-6 w-6",
-                      shouldBounceSuppport ? "animate-notification-bounce" : "animate-pulse",
-                      "hover:scale-110 hover:shadow-xl"
+                      "ml-auto flex items-center justify-center rounded-full bg-primary text-primary-foreground text-[11px] font-bold px-2 h-5 min-w-[20px] shadow-sm",
+                      supportUnreadCount > 9 ? "min-w-[24px]" : "",
+                      shouldBounceSuppport ? "animate-notification-bounce" : ""
                     )}
                   >
                     {supportUnreadCount > 99 ? "99+" : supportUnreadCount}

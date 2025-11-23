@@ -20,7 +20,7 @@ export function SubscriptionCard({ subscription, onManage, loading }: Subscripti
       <Card>
         <CardHeader>
           <CardTitle>Current Subscription</CardTitle>
-          <CardDescription>You don't have an active subscription yet</CardDescription>
+          <CardDescription>You don&apos;t have an active subscription yet</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-2 text-muted-foreground">
@@ -37,6 +37,7 @@ export function SubscriptionCard({ subscription, onManage, loading }: Subscripti
     TRIALING: { label: "Trial", variant: "secondary" as const, color: "text-blue-500" },
     PAST_DUE: { label: "Past Due", variant: "destructive" as const, color: "text-red-500" },
     CANCELED: { label: "Canceled", variant: "outline" as const, color: "text-gray-500" },
+    INCOMPLETE: { label: "Incomplete", variant: "secondary" as const, color: "text-yellow-500" },
     UNPAID: { label: "Unpaid", variant: "destructive" as const, color: "text-red-500" },
   };
 
@@ -62,7 +63,7 @@ export function SubscriptionCard({ subscription, onManage, loading }: Subscripti
             <div>
               <p className="text-sm text-muted-foreground">Start</p>
               <p className="text-sm font-medium">
-                {format(new Date(subscription.currentPeriodStart), "MMMM d, yyyy", { locale: enUS })}
+                {subscription.currentPeriodStart ? format(new Date(subscription.currentPeriodStart), "MMMM d, yyyy", { locale: enUS }) : "N/A"}
               </p>
             </div>
           </div>
@@ -71,13 +72,13 @@ export function SubscriptionCard({ subscription, onManage, loading }: Subscripti
             <div>
               <p className="text-sm text-muted-foreground">End</p>
               <p className="text-sm font-medium">
-                {format(new Date(subscription.currentPeriodEnd), "MMMM d, yyyy", { locale: enUS })}
+                {subscription.currentPeriodEnd ? format(new Date(subscription.currentPeriodEnd), "MMMM d, yyyy", { locale: enUS }) : "N/A"}
               </p>
             </div>
           </div>
         </div>
 
-        {subscription.cancelAtPeriodEnd && (
+        {subscription.cancelAtPeriodEnd && subscription.currentPeriodEnd && (
           <div className="flex items-center gap-2 p-3 bg-destructive/10 rounded-lg border border-destructive/20">
             <AlertCircle className="w-5 h-5 text-destructive" />
             <p className="text-sm text-destructive">

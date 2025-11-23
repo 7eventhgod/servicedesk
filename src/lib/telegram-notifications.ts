@@ -55,7 +55,7 @@ export async function notifyTelegramNewTicket(ticketId: string): Promise<void> {
     }
 
     const message = formatNewTicketMessage({
-      number: ticket.number,
+      number: ticket.number ? ticket.number.toString() : "N/A",
       title: ticket.title,
       description: ticket.description,
       priority: ticket.priority,
@@ -110,10 +110,10 @@ export async function notifyTelegramTicketUpdate(ticketId: string): Promise<void
     }
 
     const message = formatTicketUpdateMessage({
-      number: ticket.number,
+      number: ticket.number ? ticket.number.toString() : "N/A",
       title: ticket.title,
       status: ticket.status,
-      assignee: ticket.assignee,
+      assignee: ticket.assignee && ticket.assignee.name ? { name: ticket.assignee.name } : null,
     });
 
     await sendTelegramMessage(bot.botToken, bot.groupChatId, message, {
@@ -166,7 +166,7 @@ export async function notifyTelegramNewComment(commentId: string): Promise<void>
 
     const message = formatNewCommentMessage({
       ticket: {
-        number: comment.ticket.number,
+        number: comment.ticket.number ? comment.ticket.number.toString() : "N/A",
         title: comment.ticket.title,
       },
       author: {

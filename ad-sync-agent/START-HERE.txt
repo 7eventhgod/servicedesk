@@ -1,0 +1,32 @@
+========================================
+AD Sync Agent - QUICK START
+========================================
+
+FOR ADMINISTRATORS (End Users):
+
+If you have AD-Sync-Agent.exe file:
+
+1. Copy AD-Sync-Agent.exe to any folder
+2. Copy ad_sync_agent.py to the same folder  
+3. Run AD-Sync-Agent.exe
+4. Fill in the settings in the GUI window
+5. Click "Save settings"
+6. Click "Start agent"
+7. Done!
+
+NO NEED TO INSTALL PYTHON!
+Everything is included in .exe file!
+
+========================================
+
+FOR DEVELOPERS (Building .exe):
+
+If you need to build .exe file yourself:
+
+1. Install Python from https://www.python.org/downloads/
+2. Run build-simple.bat
+3. Wait for build to complete
+4. File will be in dist\AD-Sync-Agent.exe
+
+========================================
+

@@ -1,0 +1,48 @@
+========================================
+AD Sync Agent - QUICK START
+========================================
+
+OPTION 1: Have ready .exe file? (RECOMMENDED)
+
+   Run: AD-Sync-Agent.exe
+   
+   A window will open with a form:
+   1. Fill in all fields in the interface
+   2. Click "Save settings"
+   3. Click "Start agent"
+   4. Done!
+
+   NO NEED TO:
+   - Install Python
+   - Install dependencies
+   - Configure anything
+   
+   JUST RUN THE .EXE FILE!
+
+========================================
+
+OPTION 2: Build .exe file yourself
+
+   Run: build-simple.bat
+   
+   The script will automatically:
+   1. Check Python
+   2. Install dependencies
+   3. Build GUI application as standalone .exe
+   4. Create AD-Sync-Agent.exe file
+
+   File will be in: dist\AD-Sync-Agent.exe
+
+========================================
+
+OPTION 3: Use Python version
+
+   Run: python ad_sync_gui.py
+   
+   Or install dependencies first:
+   pip install -r requirements.txt
+   python ad_sync_gui.py
+
+========================================
+
+For detailed instructions see README.md

@@ -42,16 +42,39 @@ export async function GET(request: Request) {
     if (!session.user.tenantId) {
       return NextResponse.json({ error: "Tenant ID required" }, { status: 400 });
     }
-    where.tenantId = session.user.tenantId;
+
+    // Check if user's tenant is in a group
+    const userTenant = await prisma.tenant.findUnique({
+      where: { id: session.user.tenantId },
+      select: { groupId: true },
+    });
+
+    // If tenant is in a group, get all tenant IDs in that group
+    if (userTenant?.groupId) {
+      const groupTenants = await prisma.tenant.findMany({
+        where: { groupId: userTenant.groupId },
+        select: { id: true },
+      });
+      where.tenantId = {
+        in: groupTenants.map(t => t.id),
+      };
+    } else {
+      where.tenantId = session.user.tenantId;
+    }
 
     // Ticket visibility logic:
     // - USER: sees only their own tickets (created by them)
-    // - AGENT: sees ALL tickets of their tenant (supporting all clients)
-    // - TENANT_ADMIN: sees ALL tickets of their organization
+    // - AGENT: sees only their assigned tickets (assigned to them) - use "?all=true" to see all tenant tickets
+    // - TENANT_ADMIN: sees ALL tickets of their organization/group
+    const showAllTickets = searchParams.get("all") === "true";
+    
     if (session.user.role === "USER") {
       where.creatorId = session.user.id;
+    } else if (session.user.role === "AGENT" && !showAllTickets) {
+      // By default, agents see only their assigned tickets
+      where.assigneeId = session.user.id;
     }
-    // AGENT and TENANT_ADMIN see all tickets of their tenant (tenantId filter already set)
+    // If showAllTickets=true for AGENT, or for TENANT_ADMIN - see all tickets (tenantId filter already set)
 
     if (status) {
       where.status = status;

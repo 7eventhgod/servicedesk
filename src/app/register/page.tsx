@@ -12,7 +12,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Loader2, Building2, RefreshCw, Eye, EyeOff } from "lucide-react";
+import { Loader2, Building2, RefreshCw, Eye, EyeOff, Shield } from "lucide-react";
+import Link from "next/link";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -105,320 +106,269 @@ export default function RegisterPage() {
   };
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center p-4 relative"
-      style={{
-        background: `
-          radial-gradient(circle at 50% 50%, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0.4) 40%, rgba(0,0,0,0.9) 70%),
-          url('/images/gradient-background.jpg')
-        `,
-        backgroundSize: "auto, cover",
-        backgroundPosition: "center, 15% center",
-        backgroundRepeat: "no-repeat",
-      }}
-    >
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20 relative overflow-hidden">
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-200/30 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
+        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-purple-200/30 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
+        <div className="absolute bottom-1/4 left-1/2 w-96 h-96 bg-indigo-200/30 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] opacity-40"></div>
+      </div>
 
-      <Card
-        className="max-w-md w-full hover-lift relative z-10"
-        style={{
-          background: "rgba(255, 255, 255, 0.04)",
-          backdropFilter: "blur(20px)",
-          border: "1px solid rgba(255, 255, 255, 0.12)",
-          boxShadow: "0 8px 24px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08)",
-        }}
-      >
-        <CardHeader className="text-center space-y-2">
-          <div className="flex items-center justify-center mb-4">
-            <Building2 className="h-12 w-12 text-white/80" />
+      <header className="absolute top-0 left-0 right-0 z-50 border-b bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl shadow-sm">
+        <div className="container mx-auto flex h-20 items-center justify-between px-4 lg:px-8">
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="relative">
+              <Shield className="h-9 w-9 text-blue-600 group-hover:scale-110 transition-transform duration-300" />
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white animate-pulse"></div>
+            </div>
+            <span className="text-2xl font-extrabold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              OnPoints.it
+            </span>
+          </Link>
+          <div className="flex items-center gap-3">
+            <Link href="/login">
+              <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 font-medium">
+                Sign In
+              </button>
+            </Link>
           </div>
-          <CardTitle className="text-3xl font-bold text-white" style={{ fontFamily: "var(--font-heading)" }}>
-            Registration
-          </CardTitle>
-          <CardDescription style={{ color: "rgba(255, 255, 255, 0.7)" }}>
-            Create a new organization and get access to the system
-          </CardDescription>
-        </CardHeader>
+        </div>
+      </header>
 
-        <CardContent className="space-y-6">
-          {step === 1 ? (
-            <form onSubmit={handleStep1Submit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="tenantName" className="text-sm font-medium text-white">
-                  Organization Name *
-                </Label>
-                <Input
-                  id="tenantName"
-                  placeholder="Your company name"
-                  value={formData.tenantName}
-                  onChange={(e) => handleTenantSlugChange(e.target.value)}
-                  className="py-3 text-white placeholder:text-white/40 focus:border-[#00CFFF] focus:ring-[#00CFFF] transition-all duration-300"
-                  style={{
-                    background: "rgba(255, 255, 255, 0.06)",
-                    border: "1px solid rgba(255, 255, 255, 0.15)",
-                  }}
-                  required
-                  disabled={isLoading}
-                />
-              </div>
+      <div className="min-h-screen flex items-center justify-center p-4 relative z-10 pt-32 pb-24">
+        <Card className="max-w-md w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-2xl border border-slate-200 dark:border-slate-800">
+          <CardHeader className="text-center space-y-2">
+            <div className="flex items-center justify-center mb-4">
+              <Building2 className="h-12 w-12 text-blue-600" />
+            </div>
+            <CardTitle className="text-3xl font-black bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              Registration
+            </CardTitle>
+            <CardDescription>
+              Create a new organization and get access to the system
+            </CardDescription>
+          </CardHeader>
 
-              <div className="space-y-2">
-                <Label htmlFor="tenantSlug" className="text-sm font-medium text-white">
-                  Organization Identifier *
-                </Label>
-                <Input
-                  id="tenantSlug"
-                  placeholder="company-slug"
-                  value={formData.tenantSlug}
-                  onChange={(e) =>
-                    setFormData({ ...formData, tenantSlug: e.target.value })
-                  }
-                  className="py-3 text-white placeholder:text-white/40 focus:border-[#00CFFF] focus:ring-[#00CFFF] transition-all duration-300"
-                  style={{
-                    background: "rgba(255, 255, 255, 0.06)",
-                    border: "1px solid rgba(255, 255, 255, 0.15)",
-                  }}
-                  required
-                  disabled={isLoading}
-                />
-                <p className="text-xs" style={{ color: "rgba(255, 255, 255, 0.6)" }}>
-                  Used in URL. Only lowercase letters, numbers, and hyphens
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="tenantDomain" className="text-sm font-medium text-white">
-                  Domain (optional)
-                </Label>
-                <Input
-                  id="tenantDomain"
-                  placeholder="company.com"
-                  value={formData.tenantDomain}
-                  onChange={(e) =>
-                    setFormData({ ...formData, tenantDomain: e.target.value })
-                  }
-                  className="py-3 text-white placeholder:text-white/40 focus:border-[#00CFFF] focus:ring-[#00CFFF] transition-all duration-300"
-                  style={{
-                    background: "rgba(255, 255, 255, 0.06)",
-                    border: "1px solid rgba(255, 255, 255, 0.15)",
-                  }}
-                  disabled={isLoading}
-                />
-              </div>
-
-              {error && (
-                <div
-                  className="text-sm p-3 rounded-md"
-                  style={{
-                    color: "#FF6B6B",
-                    background: "rgba(255, 107, 107, 0.1)",
-                    border: "1px solid rgba(255, 107, 107, 0.3)",
-                  }}
-                >
-                  {error}
-                </div>
-              )}
-
-              <Button
-                type="submit"
-                className="w-full ripple-effect hover-lift font-bold py-5 transition-all duration-300 border-none hover:shadow-[0_0_10px_rgba(0,207,255,0.4)]"
-                style={{
-                  background: "linear-gradient(90deg, #007BFF, #00CFFF)",
-                  color: "#FFFFFF",
-                }}
-                disabled={isLoading}
-              >
-                Next
-              </Button>
-            </form>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name" className="text-sm font-medium text-white">
-                  Your Name *
-                </Label>
-                <Input
-                  id="name"
-                  placeholder="First Last"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                  className="py-3 text-white placeholder:text-white/40 focus:border-[#00CFFF] focus:ring-[#00CFFF] transition-all duration-300"
-                  style={{
-                    background: "rgba(255, 255, 255, 0.06)",
-                    border: "1px solid rgba(255, 255, 255, 0.15)",
-                  }}
-                  required
-                  disabled={isLoading}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium text-white">
-                  Email *
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="your@email.com"
-                  value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                  className="py-3 text-white placeholder:text-white/40 focus:border-[#00CFFF] focus:ring-[#00CFFF] transition-all duration-300"
-                  style={{
-                    background: "rgba(255, 255, 255, 0.06)",
-                    border: "1px solid rgba(255, 255, 255, 0.15)",
-                  }}
-                  required
-                  disabled={isLoading}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="text-sm font-medium text-white">
-                    Administrator Password *
+          <CardContent className="space-y-6">
+            {step === 1 ? (
+              <form onSubmit={handleStep1Submit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="tenantName" className="text-sm font-semibold">
+                    Organization Name *
                   </Label>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={generatePassword}
-                    className="transition-all hover:bg-white/10 text-white"
-                    style={{
-                      background: "rgba(255, 255, 255, 0.04)",
-                      border: "1px solid rgba(255, 255, 255, 0.12)",
-                    }}
-                    disabled={isLoading}
-                  >
-                    <RefreshCw className="mr-1 h-3 w-3" />
-                    Generate
-                  </Button>
-                </div>
-                <div className="relative">
                   <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
-                    value={formData.password}
-                    onChange={(e) =>
-                      setFormData({ ...formData, password: e.target.value })
-                    }
-                    className="py-3 text-white placeholder:text-white/40 focus:border-[#00CFFF] focus:ring-[#00CFFF] transition-all duration-300 pr-10"
-                    style={{
-                      background: "rgba(255, 255, 255, 0.06)",
-                      border: "1px solid rgba(255, 255, 255, 0.15)",
-                    }}
+                    id="tenantName"
+                    placeholder="Your company name"
+                    value={formData.tenantName}
+                    onChange={(e) => handleTenantSlugChange(e.target.value)}
+                    className="py-3"
                     required
                     disabled={isLoading}
                   />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="tenantSlug" className="text-sm font-semibold">
+                    Organization Identifier *
+                  </Label>
+                  <Input
+                    id="tenantSlug"
+                    placeholder="company-slug"
+                    value={formData.tenantSlug}
+                    onChange={(e) =>
+                      setFormData({ ...formData, tenantSlug: e.target.value })
+                    }
+                    className="py-3"
+                    required
+                    disabled={isLoading}
+                  />
+                  <p className="text-xs text-slate-500">
+                    Used in URL. Only lowercase letters, numbers, and hyphens
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="tenantDomain" className="text-sm font-semibold">
+                    Domain (optional)
+                  </Label>
+                  <Input
+                    id="tenantDomain"
+                    placeholder="company.com"
+                    value={formData.tenantDomain}
+                    onChange={(e) =>
+                      setFormData({ ...formData, tenantDomain: e.target.value })
+                    }
+                    className="py-3"
+                    disabled={isLoading}
+                  />
+                </div>
+
+                {error && (
+                  <div className="text-sm p-3 rounded-md bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400">
+                    {error}
+                  </div>
+                )}
+
+                <Button
+                  type="submit"
+                  className="w-full h-12 font-bold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/40 transition-all duration-300 border-0"
+                  disabled={isLoading}
+                >
+                  Next
+                </Button>
+              </form>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name" className="text-sm font-semibold">
+                    Your Name *
+                  </Label>
+                  <Input
+                    id="name"
+                    placeholder="First Last"
+                    value={formData.name}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
+                    className="py-3"
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-sm font-semibold">
+                    Email *
+                  </Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="your@email.com"
+                    value={formData.email}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
+                    className="py-3"
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password" className="text-sm font-semibold">
+                      Administrator Password *
+                    </Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={generatePassword}
+                      className="transition-all hover:bg-slate-50 dark:hover:bg-slate-800"
+                      disabled={isLoading}
+                    >
+                      <RefreshCw className="mr-1 h-3 w-3" />
+                      Generate
+                    </Button>
+                  </div>
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={formData.password}
+                      onChange={(e) =>
+                        setFormData({ ...formData, password: e.target.value })
+                      }
+                      className="py-3 pr-10"
+                      required
+                      disabled={isLoading}
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-slate-400 hover:text-slate-600"
+                      onClick={() => setShowPassword(!showPassword)}
+                      disabled={isLoading}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                  <p className="text-xs text-slate-500">
+                    Password will be automatically generated. You can change it or use the generated one.
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword" className="text-sm font-semibold">
+                    Confirm Password *
+                  </Label>
+                  <Input
+                    id="confirmPassword"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={formData.confirmPassword}
+                    onChange={(e) =>
+                      setFormData({ ...formData, confirmPassword: e.target.value })
+                    }
+                    className="py-3"
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+
+                {error && (
+                  <div className="text-sm p-3 rounded-md bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400">
+                    {error}
+                  </div>
+                )}
+
+                <div className="flex gap-2">
                   <Button
                     type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-white/60 hover:text-white"
-                    onClick={() => setShowPassword(!showPassword)}
+                    variant="outline"
+                    onClick={() => setStep(1)}
+                    className="flex-1 transition-all hover:bg-slate-50 dark:hover:bg-slate-800"
                     disabled={isLoading}
                   >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
+                    Back
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={isLoading}
+                    className="flex-1 font-bold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/40 transition-all duration-300 border-0"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Creating...
+                      </>
                     ) : (
-                      <Eye className="h-4 w-4" />
+                      "Create Organization"
                     )}
                   </Button>
                 </div>
-                <p className="text-xs" style={{ color: "rgba(255, 255, 255, 0.6)" }}>
-                  Password will be automatically generated. You can change it or use the generated one.
-                </p>
-              </div>
+              </form>
+            )}
 
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-sm font-medium text-white">
-                  Confirm Password *
-                </Label>
-                <Input
-                  id="confirmPassword"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  value={formData.confirmPassword}
-                  onChange={(e) =>
-                    setFormData({ ...formData, confirmPassword: e.target.value })
-                  }
-                  className="py-3 text-white placeholder:text-white/40 focus:border-[#00CFFF] focus:ring-[#00CFFF] transition-all duration-300"
-                  style={{
-                    background: "rgba(255, 255, 255, 0.06)",
-                    border: "1px solid rgba(255, 255, 255, 0.15)",
-                  }}
-                  required
-                  disabled={isLoading}
-                />
-              </div>
-
-              {error && (
-                <div
-                  className="text-sm p-3 rounded-md"
-                  style={{
-                    color: "#FF6B6B",
-                    background: "rgba(255, 107, 107, 0.1)",
-                    border: "1px solid rgba(255, 107, 107, 0.3)",
-                  }}
-                >
-                  {error}
-                </div>
-              )}
-
-              <div className="flex gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setStep(1)}
-                  className="flex-1 transition-all hover:bg-white/10 text-white"
-                  style={{
-                    background: "rgba(255, 255, 255, 0.04)",
-                    border: "1px solid rgba(255, 255, 255, 0.12)",
-                  }}
-                  disabled={isLoading}
-                >
-                  Back
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={isLoading}
-                  className="flex-1 ripple-effect hover-lift font-bold transition-all duration-300 border-none hover:shadow-[0_0_10px_rgba(0,207,255,0.4)]"
-                  style={{
-                    background: "linear-gradient(90deg, #007BFF, #00CFFF)",
-                    color: "#FFFFFF",
-                  }}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Creating...
-                    </>
-                  ) : (
-                    "Create Organization"
-                  )}
-                </Button>
-              </div>
-            </form>
-          )}
-
-          <div className="text-center pt-4" style={{ borderTop: "1px solid rgba(255, 255, 255, 0.1)" }}>
-            <p className="text-sm" style={{ color: "rgba(255, 255, 255, 0.7)" }}>
-              Already have an account?{" "}
-              <Button
-                variant="link"
-                onClick={() => router.push("/login")}
-                className="p-0 h-auto transition-colors duration-300 hover:text-[#4FC3F7]"
-                style={{ color: "#00CFFF" }}
-              >
-                Sign In
-              </Button>
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+            <div className="text-center pt-4 border-t border-slate-200 dark:border-slate-800">
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                Already have an account?{" "}
+                <Link href="/login">
+                  <Button variant="link" className="p-0 h-auto text-blue-600 hover:text-blue-700 dark:hover:text-blue-400">
+                    Sign In
+                  </Button>
+                </Link>
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

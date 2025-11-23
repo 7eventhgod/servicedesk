@@ -97,6 +97,7 @@ export async function POST(request: NextRequest) {
         priority: validatedData.priority || "MEDIUM",
         tenantId: session.user.tenantId,
         creatorId: session.user.id,
+        lastViewedByAdminAt: null, // New ticket is unread for super admin
       },
       include: {
         tenant: {

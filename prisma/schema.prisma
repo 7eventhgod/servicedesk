@@ -29,11 +29,23 @@ model Tenant {
   slug      String   @unique
   domain    String?  @unique
   
+  // Subdomain support (e.g., help.sig.az)
+  subdomain             String?  @unique
+  subdomainVerified     Boolean  @default(false)
+  subdomainVerificationToken String?  // Token for verification via TXT record
+  
   // Custom domain support
   customDomain          String?  @unique
   customDomainVerified  Boolean  @default(false)
   dnsVerificationToken  String?  // Token for verification via TXT record
   sslEnabled            Boolean  @default(false)
+  
+  // AD Sync support
+  adSyncEnabled         Boolean  @default(false)
+  adSyncApiKey         String?  @unique  // API key for AD sync agent authentication
+  
+  // Demo mode - resets data on server restart
+  isDemo    Boolean  @default(false)
   
   // Tenant grouping
   groupId   String?  // Optional group for combining tenants
@@ -1092,7 +1104,8 @@ model SupportTicket {
   lastViewedByCreatorAt DateTime? @default(now())
   
   // Tracking read status by super-admin (when super-admin last viewed the ticket)
-  lastViewedByAdminAt DateTime? @default(now())
+  // null means ticket hasn't been viewed by super admin yet
+  lastViewedByAdminAt DateTime?
   
   // Comments
   comments    SupportComment[]

@@ -1,0 +1,68 @@
+========================================
+HOW TO BUILD AD-Sync-Agent .NET VERSION
+========================================
+
+METHOD 1: Visual Studio (RECOMMENDED)
+
+1. Install Visual Studio:
+   - Download from: https://visualstudio.microsoft.com/downloads/
+   - Install "Desktop development with C++" or "Desktop development with .NET"
+   - Or use Visual Studio Community (free)
+
+2. Open ADSyncAgent.sln:
+   - Double-click ADSyncAgent.sln
+   - Or File -> Open -> Project/Solution -> select ADSyncAgent.sln
+
+3. Build:
+   - Press F6 or Build -> Build Solution
+   - Wait for build to complete
+
+4. Result:
+   - File: ADSyncAgent\bin\Release\AD-Sync-Agent.exe
+   - Ready to use!
+
+========================================
+
+METHOD 2: MSBuild (Command Line)
+
+1. Install Build Tools for Visual Studio:
+   - Download from: https://visualstudio.microsoft.com/downloads/
+   - Select "Build Tools for Visual Studio"
+
+2. Run:
+   cd net
+   build.bat
+
+3. Result:
+   - File: ADSyncAgent\bin\Release\AD-Sync-Agent.exe
+
+========================================
+
+METHOD 3: Manual Build
+
+If Visual Studio doesn't open the solution:
+
+1. Open Visual Studio
+2. File -> Open -> Project/Solution
+3. Navigate to net folder
+4. Select ADSyncAgent.sln
+5. Click Open
+6. If asked to restore packages, click Yes
+7. Build -> Build Solution
+
+========================================
+
+TROUBLESHOOTING:
+
+If .sln file doesn't open:
+- Make sure you have Visual Studio installed
+- Try right-click -> Open With -> Visual Studio
+- Or manually open in Visual Studio (File -> Open)
+
+If build fails:
+- Right-click project -> Restore NuGet Packages
+- Check .NET Framework 4.7.2 is installed
+- Try Clean Solution then Build Solution
+
+========================================
+

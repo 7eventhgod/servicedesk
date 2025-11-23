@@ -33,11 +33,30 @@ export async function GET(
       return NextResponse.json({ error: "Tenant ID required" }, { status: 400 });
     }
 
+    // Check if user's tenant is in a group
+    const userTenant = await prisma.tenant.findUnique({
+      where: { id: session.user.tenantId },
+      select: { groupId: true },
+    });
+
+    // Build where clause based on group membership
+    let whereClause: any = { id: params.id };
+    
+    if (userTenant?.groupId) {
+      // If tenant is in a group, get all tenant IDs in that group
+      const groupTenants = await prisma.tenant.findMany({
+        where: { groupId: userTenant.groupId },
+        select: { id: true },
+      });
+      whereClause.tenantId = {
+        in: groupTenants.map(t => t.id),
+      };
+    } else {
+      whereClause.tenantId = session.user.tenantId;
+    }
+
     const ticket = await prisma.ticket.findFirst({
-      where: {
-        id: params.id,
-        tenantId: session.user.tenantId,
-      },
+      where: whereClause,
       include: {
         creator: {
           select: {
@@ -131,12 +150,30 @@ export async function PATCH(
     const body = await request.json();
     const validatedData = updateTicketSchema.parse(body);
 
+    // Check if user's tenant is in a group
+    const userTenant = await prisma.tenant.findUnique({
+      where: { id: session.user.tenantId },
+      select: { groupId: true },
+    });
+
+    // Build where clause based on group membership
+    let whereClause: any = { id: params.id };
+    
+    if (userTenant?.groupId) {
+      const groupTenants = await prisma.tenant.findMany({
+        where: { groupId: userTenant.groupId },
+        select: { id: true },
+      });
+      whereClause.tenantId = {
+        in: groupTenants.map(t => t.id),
+      };
+    } else {
+      whereClause.tenantId = session.user.tenantId;
+    }
+
     // Check ticket existence and access rights
     const existingTicket = await prisma.ticket.findFirst({
-      where: {
-        id: params.id,
-        tenantId: session.user.tenantId,
-      },
+      where: whereClause,
     });
 
     if (!existingTicket) {
@@ -145,17 +182,29 @@ export async function PATCH(
 
     // Ticket update access logic:
     // - USER: can update only their own tickets
-    // - AGENT: can update tickets assigned to them or all organization tickets
+    // - AGENT: can update tickets assigned to them, or assign tickets to themselves
     // - TENANT_ADMIN: can update all organization tickets
     // - ADMIN: can update all organization tickets
     if (session.user.role === "USER" && existingTicket.creatorId !== session.user.id) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
     
-    if (session.user.role === "AGENT" && 
-        existingTicket.creatorId !== session.user.id && 
-        existingTicket.assigneeId !== session.user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (session.user.role === "AGENT") {
+      // Agent can update if:
+      // 1. Ticket is assigned to them, OR
+      // 2. They are assigning the ticket to themselves (assigneeId = their id)
+      const isAssigningToSelf = validatedData.assigneeId === session.user.id;
+      const isAssignedToThem = existingTicket.assigneeId === session.user.id;
+      const isCreator = existingTicket.creatorId === session.user.id;
+      
+      if (!isAssignedToThem && !isCreator && !isAssigningToSelf) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
+      
+      // Allow agent to assign ticket to themselves (even if not currently assigned)
+      if (isAssigningToSelf && !isAssignedToThem && !isCreator) {
+        // Agent can assign unassigned tickets or reassign tickets to themselves
+      }
     }
 
     // Ticket field update logic
@@ -235,12 +284,32 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Check if user's tenant is in a group
+    const userTenant = await prisma.tenant.findUnique({
+      where: { id: session.user.tenantId },
+      select: { groupId: true },
+    });
+
+    // Build where clause based on group membership
+    let whereClause: any = { 
+      id: params.id,
+      creatorId: session.user.id, // Own tickets only
+    };
+    
+    if (userTenant?.groupId) {
+      const groupTenants = await prisma.tenant.findMany({
+        where: { groupId: userTenant.groupId },
+        select: { id: true },
+      });
+      whereClause.tenantId = {
+        in: groupTenants.map(t => t.id),
+      };
+    } else {
+      whereClause.tenantId = session.user.tenantId;
+    }
+
     const ticket = await prisma.ticket.findFirst({
-      where: {
-        id: params.id,
-        tenantId: session.user.tenantId,
-        creatorId: session.user.id, // Own tickets only
-      },
+      where: whereClause,
     });
 
     if (!ticket) {

@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
     });
 
     // Prices in cents
-    const priceMap = {
+    const priceMap: Record<string, number> = {
       PRO: 4900, // $49/month
       ENTERPRISE: 19900, // $199/month
     };

@@ -14,8 +14,8 @@ interface Tenant {
   id: string;
   name: string;
   slug: string;
-  settings: {
-    modules: {
+  settings?: {
+    modules?: {
       [key: string]: boolean;
     };
   };
@@ -77,7 +77,7 @@ export default function AdminModulesPage() {
       if (!tenant) throw new Error("Tenant not found");
 
       const newModules = {
-        ...tenant.settings.modules,
+        ...(tenant.settings?.modules || {}),
         [moduleKey]: !currentValue
       };
 
@@ -96,7 +96,7 @@ export default function AdminModulesPage() {
             ? {
                 ...t,
                 settings: {
-                  ...t.settings,
+                  ...(t.settings || {}),
                   modules: newModules
                 }
               }
@@ -133,7 +133,7 @@ export default function AdminModulesPage() {
             ? {
                 ...t,
                 settings: {
-                  ...t.settings,
+                  ...(t.settings || {}),
                   modules: allModules
                 }
               }
@@ -176,7 +176,7 @@ export default function AdminModulesPage() {
 
       <div className="space-y-6">
         {tenants.map(tenant => {
-          const enabledCount = Object.values(tenant.settings.modules || {}).filter(Boolean).length;
+          const enabledCount = Object.values(tenant.settings?.modules || {}).filter(Boolean).length;
           
           return (
             <Card key={tenant.id} className="border-2">
@@ -210,7 +210,7 @@ export default function AdminModulesPage() {
               <CardContent>
                 <div className="grid gap-4 md:grid-cols-2">
                   {AVAILABLE_MODULES.map(module => {
-                    const isEnabled = tenant.settings.modules?.[module.key] || false;
+                    const isEnabled = tenant.settings?.modules?.[module.key] || false;
                     const updateKey = `${tenant.id}-${module.key}`;
                     const isUpdating = updatingModules[updateKey];
 

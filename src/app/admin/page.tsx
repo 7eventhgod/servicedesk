@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,15 +34,15 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (status === "loading") return;
     
-    // Only for global admins
-    if (!session || session.user.role !== "ADMIN") {
+    // Only for global super-admins (without tenantId)
+    if (!session || session.user.role !== "ADMIN" || session.user.tenantId) {
       router.push("/dashboard");
       return;
     }
   }, [session, status, router]);
 
   useEffect(() => {
-    if (!session || session.user.role !== "ADMIN") return;
+    if (!session || session.user.role !== "ADMIN" || session.user.tenantId) return;
 
     async function fetchStats() {
       try {
@@ -161,91 +161,129 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="space-y-8 p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent flex items-center gap-3">
-            <Shield className="h-10 w-10 text-red-600" />
-            Admin Panel
-          </h1>
-          <p className="text-muted-foreground mt-2 text-lg">
-            Global ServiceDesk platform management
-          </p>
+    <div className="min-h-screen bg-black text-white">
+      {/* Tech Hero */}
+      <div className="relative overflow-hidden border-b border-neutral-900">
+        {/* Grid pattern overlay */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+        
+        <div className="relative px-8 pt-20 pb-16 max-w-7xl mx-auto">
+          <div className="flex items-start justify-between">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-neutral-900 border border-neutral-800 mb-8">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                  <div className="w-1 h-1 rounded-full bg-green-500/50"></div>
+                  <div className="w-0.5 h-0.5 rounded-full bg-green-500/30"></div>
+                </div>
+                <span className="text-[10px] font-mono font-bold text-green-400 uppercase tracking-[0.2em]">
+                  SYSTEM_ADMIN
+                </span>
+              </div>
+              <h1 className="text-6xl md:text-7xl font-bold tracking-tight mb-6 font-mono">
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-neutral-300 to-neutral-600">
+                  ./ADMIN
+                </span>
+              </h1>
+              <p className="text-neutral-400 text-lg max-w-2xl leading-relaxed font-light">
+                Execute administrative commands. Manage system infrastructure.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        {statCards.map((stat, index) => (
-          <Card key={index} className="border-2 hover:shadow-xl transition-all duration-300">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                {stat.title}
-              </CardTitle>
-              {stat.icon}
-            </CardHeader>
-            <CardContent>
-              <div className={`text-3xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}>
+      {/* Tech Stats */}
+      <div className="px-8 py-12 max-w-7xl mx-auto">
+        <div className="grid gap-3 md:grid-cols-4 mb-20">
+          {statCards.map((stat, index) => (
+            <div 
+              key={index} 
+              className="group relative cursor-pointer p-6 rounded-lg border border-neutral-900 bg-neutral-950/50 hover:bg-neutral-900/50 hover:border-neutral-800 transition-all duration-150"
+            >
+              {/* Terminal effect */}
+              <div className="absolute top-3 left-3 w-2 h-2 rounded-full bg-green-500/20 group-hover:bg-green-500/40 transition-colors"></div>
+              
+              <div className="flex items-start justify-between mb-4 pt-2">
+                <span className="text-[10px] font-mono font-bold text-neutral-500 uppercase tracking-wide">
+                  {stat.title}
+                </span>
+                <div className="text-neutral-800 group-hover:text-neutral-600 transition-colors">
+                  {stat.icon}
+                </div>
+              </div>
+              <div className="text-4xl font-bold font-mono text-white mb-1">
                 {stat.value}
               </div>
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="text-xs text-neutral-500 font-mono">
                 {stat.description}
               </p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Admin Actions */}
-      <div>
-        <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-          <TrendingUp className="h-6 w-6" />
-          Administrative Functions
-        </h2>
-        <div className="grid gap-6 md:grid-cols-2">
-          {adminActions.map((action, index) => (
-            <Card 
-              key={index} 
-              className="border-2 hover:border-primary hover:shadow-xl transition-all duration-300 cursor-pointer group"
-              onClick={() => router.push(action.href)}
-            >
-              <CardHeader>
-                <div className="flex items-start gap-4">
-                  <div className={`p-3 rounded-xl bg-gradient-to-br ${action.color} text-white group-hover:scale-110 transition-transform`}>
-                    {action.icon}
-                  </div>
-                  <div className="flex-1">
-                    <CardTitle className="text-xl mb-2">{action.title}</CardTitle>
-                    <CardDescription className="text-base">
-                      {action.description}
-                    </CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                  Go To →
-                </Button>
-              </CardContent>
-            </Card>
+            </div>
           ))}
         </div>
-      </div>
 
-      {/* Warning Notice */}
-      <Card className="border-yellow-500 bg-yellow-50">
-        <CardHeader>
-          <CardTitle className="text-yellow-800 flex items-center gap-2">
-            <Shield className="h-5 w-5" />
-            Warning: Super-Administrator Mode
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="text-yellow-700">
-          You have full access to all system data and functions. All actions are logged in audit log.
-          Please be careful when making changes.
-        </CardContent>
-      </Card>
+        {/* Tech Modules */}
+        <div>
+          <div className="flex items-center gap-3 mb-8">
+            <div className="h-px w-12 bg-gradient-to-r from-green-500 to-transparent"></div>
+            <h2 className="text-[10px] font-mono font-bold text-neutral-500 uppercase tracking-[0.3em]">
+              /MODULES
+            </h2>
+          </div>
+          
+          <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
+            {adminActions.map((action, index) => (
+              <div
+                key={index}
+                className="group relative p-5 rounded-lg border border-neutral-900 bg-neutral-950/50 hover:bg-neutral-900/50 hover:border-neutral-800 cursor-pointer transition-all duration-150"
+                onClick={() => router.push(action.href)}
+              >
+                {/* Terminal cursor */}
+                <div className="absolute top-3 left-3 w-1.5 h-4 bg-green-500/0 group-hover:bg-green-500 transition-all duration-150"></div>
+                
+                <div className="flex items-start gap-4 mb-3 pt-1">
+                  <div className="flex items-center justify-center w-10 h-10 rounded border border-neutral-800 bg-black group-hover:border-neutral-700 group-hover:bg-neutral-950 transition-colors">
+                    {React.cloneElement(action.icon, { 
+                      className: "h-5 w-5 text-neutral-600"
+                    })}
+                  </div>
+                </div>
+                <h3 className="text-base font-bold text-white mb-2 group-hover:text-green-400 transition-colors font-mono">
+                  {action.title}
+                </h3>
+                <p className="text-sm text-neutral-500 leading-relaxed line-clamp-2 font-light">
+                  {action.description}
+                </p>
+                <div className="absolute top-5 right-5 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span className="text-green-400 font-mono text-xs">{'>'}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Tech Warning */}
+        <div className="mt-20 relative p-6 rounded-lg border border-orange-900 bg-orange-950/10">
+          {/* Scan line effect */}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-green-500/5 to-transparent animate-pulse"></div>
+          
+          <div className="relative flex items-start gap-4">
+            <div className="flex-shrink-0">
+              <div className="flex items-center justify-center w-10 h-10 rounded border border-orange-900 bg-orange-950/20">
+                <Shield className="h-5 w-5 text-orange-500" />
+              </div>
+            </div>
+            <div className="flex-1">
+              <h3 className="text-sm font-bold text-orange-400 mb-2 font-mono">
+                [WARNING] ROOT ACCESS
+              </h3>
+              <p className="text-sm text-neutral-500 leading-relaxed font-light">
+                Full system privileges enabled. All actions are logged to /var/log/audit.log
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

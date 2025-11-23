@@ -3,13 +3,14 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
-import { createAuditLog } from "@/lib/audit-log";
+import { createAuditLog, getClientIp, getUserAgent } from "@/lib/audit-log";
+import { WebhookEvent } from "@prisma/client";
 
 const updateWebhookSchema = z.object({
   name: z.string().min(1).optional(),
   url: z.string().url().optional(),
   secret: z.string().optional(),
-  events: z.array(z.string()).optional(),
+  events: z.array(z.enum(["TICKET_CREATED", "TICKET_UPDATED", "TICKET_RESOLVED", "TICKET_CLOSED", "COMMENT_ADDED", "USER_CREATED", "CATEGORY_CREATED", "ALL"])).optional(),
   isActive: z.boolean().optional(),
   headers: z.record(z.string()).optional(),
 });
@@ -28,7 +29,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
 
     const updated = await prisma.webhook.update({ where: { id: params.id }, data });
     
-    await createAuditLog({ tenantId: session.user.tenantId, userId: session.user.id, action: "UPDATE", resourceType: "WEBHOOK", resourceId: updated.id, metadata: { name: updated.name }, request });
+    await createAuditLog({ tenantId: session.user.tenantId, userId: session.user.id, action: "UPDATE", resourceType: "WEBHOOK", resourceId: updated.id, metadata: { name: updated.name }, ipAddress: getClientIp(request), userAgent: getUserAgent(request) });
     
     return NextResponse.json(updated);
   } catch (error: any) {
@@ -46,7 +47,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
     if (!webhook) return NextResponse.json({ error: "Webhook not found" }, { status: 404 });
 
     await prisma.webhook.delete({ where: { id: params.id } });
-    await createAuditLog({ tenantId: session.user.tenantId, userId: session.user.id, action: "DELETE", resourceType: "WEBHOOK", resourceId: webhook.id, metadata: { name: webhook.name }, request });
+    await createAuditLog({ tenantId: session.user.tenantId, userId: session.user.id, action: "DELETE", resourceType: "WEBHOOK", resourceId: webhook.id, metadata: { name: webhook.name }, ipAddress: getClientIp(request), userAgent: getUserAgent(request) });
     
     return NextResponse.json({ success: true });
   } catch (error: any) {

@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { getTenantWhereClause } from "@/lib/api-utils";
 
 const createFilterSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -85,7 +86,7 @@ export async function POST(request: Request) {
       data: {
         ...validatedData,
         userId: session.user.id,
-        ...getTenantWhereClause(session),
+        tenantId: session.user.tenantId!,
       },
       include: {
         user: {

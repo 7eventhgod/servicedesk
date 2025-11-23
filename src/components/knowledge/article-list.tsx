@@ -39,6 +39,7 @@ interface KnowledgeArticle {
   id: string;
   title: string;
   slug: string;
+  content: string;
   excerpt: string | null;
   status: string;
   isPublic: boolean;

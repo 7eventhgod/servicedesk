@@ -351,7 +351,16 @@ export default function AdminSupportTicketDetailPage() {
             <Textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              placeholder="Enter your reply or comment (minimum 5 characters)"
+              onKeyDown={(e) => {
+                // Send on Enter (without Shift), prevent default to avoid new line
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  if (comment.trim().length >= 5 && !isUpdating) {
+                    handleAddComment();
+                  }
+                }
+              }}
+              placeholder="Enter your reply or comment (minimum 5 characters). Press Enter to send, Shift+Enter for new line."
               rows={4}
               className={comment && comment.length < 5 ? "border-red-500" : ""}
             />

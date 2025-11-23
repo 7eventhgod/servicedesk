@@ -160,6 +160,16 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
+      // Получаем hostname для проверки тенанта по домену
+      // Note: headers() is only available in Server Components/API routes
+      // For signIn callback, we'll check tenant later if needed
+      // const headersList = headers();
+      // const hostname = headersList.get("host") || headersList.get("x-tenant-hostname");
+      // const customDomain = headersList.get("x-custom-domain");
+      
+      // Проверка тенанта по домену будет выполнена в middleware/domain-tenant.ts
+      // Здесь мы только проверяем, что пользователь существует и активен
+
       // Credentials provider - already processed in authorize
       if (account?.provider === "credentials") {
         return true;
@@ -249,7 +259,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
-        session.user.role = token.role as string;
+        session.user.role = token.role;
         session.user.tenantId = token.tenantId as string;
         session.user.tenantSlug = token.tenantSlug as string;
         session.user.permissions = token.permissions as any;

@@ -91,7 +91,9 @@ export async function POST(
     }
 
     // Check that user creates user in their organization
-    if (session.user.tenantId !== params.id) {
+    // Global ADMIN (without tenantId) can create users in any organization
+    // TENANT_ADMIN can only create users in their own organization
+    if (session.user.tenantId && session.user.tenantId !== params.id) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

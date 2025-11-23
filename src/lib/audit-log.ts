@@ -14,27 +14,47 @@ export type AuditAction =
   | "UNASSIGN"
   | "STATUS_CHANGE"
   | "COMMENT"
-  | "INVITE";
+  | "INVITE"
+  | "subscription.created"
+  | "subscription.updated"
+  | "subscription.deleted"
+  | "invoice.paid"
+  | "invoice.payment_failed";
 
 export type ResourceType =
   | "TICKET"
   | "USER"
   | "CATEGORY"
   | "TENANT"
+  | "TENANT_MODULES"
   | "COMMENT"
   | "ROLE"
   | "PERMISSION"
-  | "SETTINGS";
+  | "SETTINGS"
+  | "ASSET"
+  | "KNOWLEDGE"
+  | "KNOWLEDGE_ARTICLE"
+  | "WEBHOOK"
+  | "LDAP"
+  | "LDAP_CONFIG"
+  | "QUEUE"
+  | "SLA_POLICY"
+  | "CUSTOM_FIELD"
+  | "AUTOMATION_RULE"
+  | "NOTIFICATION"
+  | "FILTER"
+  | "subscription"
+  | "invoice";
 
 interface AuditLogOptions {
   tenantId: string;
-  userId?: string;
+  userId?: string | null;
   action: AuditAction;
   resourceType: ResourceType;
   resourceId?: string;
   metadata?: Record<string, any>;
-  ipAddress?: string;
-  userAgent?: string;
+  ipAddress?: string | null;
+  userAgent?: string | null;
 }
 
 /**
@@ -49,7 +69,7 @@ export async function createAuditLog(options: AuditLogOptions): Promise<void> {
         action: options.action,
         resourceType: options.resourceType,
         resourceId: options.resourceId || null,
-        metadata: options.metadata || null,
+        metadata: options.metadata || undefined,
         ipAddress: options.ipAddress || null,
         userAgent: options.userAgent || null,
       },

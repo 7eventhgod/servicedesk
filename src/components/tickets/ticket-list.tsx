@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -13,10 +15,11 @@ import {
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getInitials } from "@/lib/utils";
-import { MessageSquare, Hash } from "lucide-react";
+import { MessageSquare, Hash, UserPlus, Loader2 } from "lucide-react";
 import { formatTicketNumber } from "@/lib/ticket-utils";
 import { motion } from "framer-motion";
 import { SlaBadge } from "@/components/sla/sla-badge";
+import { toast } from "sonner";
 
 interface Ticket {
   id: string;
@@ -88,17 +91,25 @@ const priorityLabels: Record<string, string> = {
   URGENT: "Urgent",
 };
 
-export function TicketList() {
+interface TicketListProps {
+  showAll?: boolean; // For agents: show all tenant tickets
+  allowSelfAssign?: boolean; // For agents: allow assigning tickets to themselves
+}
+
+export function TicketList({ showAll = false, allowSelfAssign = false }: TicketListProps = {}) {
   const router = useRouter();
+  const { data: session } = useSession();
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
+  const [assigningTicketId, setAssigningTicketId] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        // Load tickets
-        const ticketsResponse = await fetch("/api/tickets");
+        // Load tickets - use ?all=true if showAll is true
+        const url = showAll ? "/api/tickets?all=true" : "/api/tickets";
+        const ticketsResponse = await fetch(url);
         const ticketsData = await ticketsResponse.json();
         setTickets(ticketsData);
 
@@ -139,7 +150,40 @@ export function TicketList() {
     return () => {
       window.removeEventListener('commentAdded', handleCommentAdded as EventListener);
     };
-  }, []);
+  }, [showAll]);
+
+  const handleAssignToSelf = async (ticketId: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click
+    if (!session?.user?.id) return;
+    
+    setAssigningTicketId(ticketId);
+    try {
+      const response = await fetch(`/api/tickets/${ticketId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ assigneeId: session.user.id }),
+      });
+
+      if (!response.ok) throw new Error("Failed to assign ticket");
+
+      const updatedTicket = await response.json();
+      
+      // Update ticket in list
+      setTickets(prevTickets =>
+        prevTickets.map(ticket =>
+          ticket.id === ticketId
+            ? { ...ticket, assignee: updatedTicket.assignee }
+            : ticket
+        )
+      );
+      
+      toast.success("Ticket assigned to you!");
+    } catch (error) {
+      console.error("Error assigning ticket:", error);
+    } finally {
+      setAssigningTicketId(null);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -173,10 +217,35 @@ export function TicketList() {
           transition={{ delay: index * 0.05, duration: 0.3 }}
         >
           <Card
-            className="cursor-pointer hover:shadow-xl transition-all duration-300 sm:hover:-translate-y-1 border-l-4 overflow-hidden group touch-manipulation active:scale-[0.98]"
+            className="cursor-pointer hover:shadow-xl transition-all duration-300 sm:hover:-translate-y-1 border-l-4 overflow-hidden group touch-manipulation active:scale-[0.98] relative"
             style={{ borderLeftColor: ticket.category?.color || '#3b82f6' }}
             onClick={() => router.push(`/dashboard/tickets/${ticket.id}`)}
           >
+            {/* Assign to self button for agents */}
+            {allowSelfAssign && ticket.assignee?.id !== session?.user?.id && (
+              <div className="absolute top-2 right-2 z-10" onClick={(e) => e.stopPropagation()}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={(e) => handleAssignToSelf(ticket.id, e)}
+                  disabled={assigningTicketId === ticket.id}
+                  className="bg-white/90 hover:bg-white backdrop-blur-sm shadow-md text-xs"
+                >
+                  {assigningTicketId === ticket.id ? (
+                    <>
+                      <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                      <span className="hidden sm:inline">Assigning...</span>
+                    </>
+                  ) : (
+                    <>
+                      <UserPlus className="h-3 w-3 mr-1" />
+                      <span className="hidden sm:inline">Assign to me</span>
+                      <span className="sm:hidden">Assign</span>
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
             <CardHeader className="pb-2 sm:pb-3 px-3 sm:px-6 py-3 sm:py-4">
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                 <div className="flex-1 min-w-0">

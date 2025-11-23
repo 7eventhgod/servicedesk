@@ -96,14 +96,14 @@ async function executeAction(action: Action, ticketData: TicketData): Promise<vo
       case "CHANGE_STATUS":
         await prisma.ticket.update({
           where: { id: ticketData.id },
-          data: { status: action.value },
+          data: { status: action.value as any },
         });
         break;
 
       case "CHANGE_PRIORITY":
         await prisma.ticket.update({
           where: { id: ticketData.id },
-          data: { priority: action.value },
+          data: { priority: action.value as any },
         });
         break;
 
@@ -121,7 +121,6 @@ async function executeAction(action: Action, ticketData: TicketData): Promise<vo
             content: action.value,
             ticketId: ticketData.id,
             authorId: action.value || ticketData.assigneeId || ticketData.tenantId, // Fallback to system
-            tenantId: ticketData.tenantId,
           },
         });
         break;
@@ -132,11 +131,10 @@ async function executeAction(action: Action, ticketData: TicketData): Promise<vo
           await prisma.notification.create({
             data: {
               type: "TICKET_UPDATED",
+              title: "Ticket Updated",
               message: action.value,
               userId: ticketData.assigneeId,
-              tenantId: ticketData.tenantId,
-              resourceType: "ticket",
-              resourceId: ticketData.id,
+              ticketId: ticketData.id,
             },
           });
         }

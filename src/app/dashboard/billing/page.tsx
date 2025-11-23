@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { PlanCard } from "@/components/billing/plan-card";
@@ -12,7 +12,7 @@ import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import { PlanType, Subscription } from "@prisma/client";
 import { toast } from "sonner";
 
-export default function BillingPage() {
+function BillingPageContent() {
   const { data: session } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -207,6 +207,14 @@ export default function BillingPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function BillingPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <BillingPageContent />
+    </Suspense>
   );
 }
 

@@ -17,7 +17,7 @@ import { Loader2 } from "lucide-react";
 const assetSchema = z.object({
   name: z.string().min(1, "Name is required"),
   type: z.string().min(1, "Select type"),
-  status: z.string().default("AVAILABLE"),
+  status: z.string(),
   manufacturer: z.string().optional(),
   model: z.string().optional(),
   serialNumber: z.string().optional(),

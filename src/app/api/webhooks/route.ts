@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
-import { createAuditLog } from "@/lib/audit-log";
+import { createAuditLog, getClientIp, getUserAgent } from "@/lib/audit-log";
 import { getTenantWhereClause, getTenantIdForCreate } from "@/lib/api-utils";
 
 const webhookSchema = z.object({
@@ -59,7 +59,8 @@ export async function POST(request: Request) {
       resourceType: "WEBHOOK",
       resourceId: webhook.id,
       metadata: { name: webhook.name, url: webhook.url },
-      request,
+      ipAddress: getClientIp(request),
+      userAgent: getUserAgent(request),
     });
 
     return NextResponse.json(webhook, { status: 201 });

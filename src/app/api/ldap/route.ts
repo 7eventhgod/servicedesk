@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
-import { createAuditLog } from "@/lib/audit-log";
+import { createAuditLog, getClientIp, getUserAgent } from "@/lib/audit-log";
 import { getTenantWhereClause, getTenantIdForCreate } from "@/lib/api-utils";
 
 const ldapConfigSchema = z.object({
@@ -82,7 +82,8 @@ export async function POST(request: Request) {
       resourceType: "LDAP_CONFIG",
       resourceId: config.id,
       metadata: { name: config.name, type: config.type },
-      request,
+      ipAddress: getClientIp(request),
+      userAgent: getUserAgent(request),
     });
 
     return NextResponse.json(config, { status: 201 });

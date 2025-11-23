@@ -27,11 +27,11 @@ export function CreateTenantDialog() {
     domain: "",
   });
 
-  // Check that user is admin
+  // Check that user is admin (global or tenant admin)
   useEffect(() => {
     if (status === "loading") return; // Wait for session to load
     
-    if (!session || session.user.role !== "ADMIN") {
+    if (!session || (session.user.role !== "ADMIN" && session.user.role !== "TENANT_ADMIN")) {
       router.push("/dashboard");
       return;
     }
@@ -61,14 +61,18 @@ export function CreateTenantDialog() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          ...formData,
-          domain: formData.domain || null,
+          name: formData.name,
+          slug: formData.slug,
+          domain: formData.domain.trim() || undefined,
         }),
       });
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || "Failed to create tenant");
+        const errorMessage = data.details ? 
+          `${data.error}: ${data.details.map((d: any) => d.message).join(", ")}` :
+          data.error;
+        throw new Error(errorMessage || "Failed to create tenant");
       }
 
       router.push("/dashboard/tenants");

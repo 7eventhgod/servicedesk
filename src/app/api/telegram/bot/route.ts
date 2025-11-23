@@ -54,16 +54,10 @@ export async function GET(req: NextRequest) {
           select: {
             id: true,
             telegramId: true,
-            username: true,
+            telegramUsername: true,
             firstName: true,
             lastName: true,
-            chatId: true,
-            user: {
-              select: {
-                name: true,
-                email: true,
-              },
-            },
+            userId: true,
           },
         },
       },

@@ -24,12 +24,30 @@ export async function POST(
     const body = await request.json();
     const validatedData = createCommentSchema.parse(body);
 
+    // Check if user's tenant is in a group
+    const userTenant = await prisma.tenant.findUnique({
+      where: { id: session.user.tenantId },
+      select: { groupId: true },
+    });
+
+    // Build where clause based on group membership
+    let whereClause: any = { id: params.id };
+    
+    if (userTenant?.groupId) {
+      const groupTenants = await prisma.tenant.findMany({
+        where: { groupId: userTenant.groupId },
+        select: { id: true },
+      });
+      whereClause.tenantId = {
+        in: groupTenants.map(t => t.id),
+      };
+    } else {
+      whereClause.tenantId = session.user.tenantId;
+    }
+
     // Check ticket access
     const ticket = await prisma.ticket.findFirst({
-      where: {
-        id: params.id,
-        tenantId: session.user.tenantId,
-      },
+      where: whereClause,
     });
 
     if (!ticket) {

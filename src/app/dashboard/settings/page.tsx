@@ -18,6 +18,7 @@ interface TenantData {
   name: string;
   slug: string;
   domain: string | null;
+  subdomain: string | null;
   customDomain: string | null;
   customDomainVerified: boolean;
   settings: {
@@ -44,6 +45,13 @@ export default function SettingsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [organizationName, setOrganizationName] = useState("");
   const [ticketPrefix, setTicketPrefix] = useState("");
+  const [subdomain, setSubdomain] = useState<string | null>(null);
+  const [subdomainInput, setSubdomainInput] = useState("");
+  const [subdomainVerified, setSubdomainVerified] = useState(false);
+  const [subdomainVerificationToken, setSubdomainVerificationToken] = useState<string | null>(null);
+  const [isSavingSubdomain, setIsSavingSubdomain] = useState(false);
+  const [isRemovingSubdomain, setIsRemovingSubdomain] = useState(false);
+  const [isVerifyingSubdomain, setIsVerifyingSubdomain] = useState(false);
   
   // Redirect global ADMIN to tenant management page
   // IMPORTANT: useEffect must be BEFORE any conditional returns!
@@ -72,6 +80,18 @@ export default function SettingsPage() {
       setTenantData(data);
       setOrganizationName(data.name);
       setTicketPrefix(data.settings?.ticketPrefix || "TICKET");
+      setSubdomain(data.subdomain || null);
+      setSubdomainInput(data.subdomain || "");
+      
+      // Also fetch current subdomain with verification status
+      const subdomainResponse = await fetch(`/api/tenants/${session.user.tenantId}/subdomain`);
+      if (subdomainResponse.ok) {
+        const subdomainData = await subdomainResponse.json();
+        setSubdomain(subdomainData.subdomain || null);
+        setSubdomainInput(subdomainData.subdomain || "");
+        setSubdomainVerified(subdomainData.verified || false);
+        setSubdomainVerificationToken(subdomainData.verificationToken || null);
+      }
     } catch (error) {
       console.error("Error fetching tenant data:", error);
       toast.error("Failed to load organization data");
@@ -276,6 +296,219 @@ export default function SettingsPage() {
                       <p className="text-xs text-muted-foreground">
                         Prefix for ticket numbers (e.g., {ticketPrefix || "TICKET"}-1234)
                       </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="subdomain">Subdomain (optional)</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          id="subdomain"
+                          placeholder={tenantData?.domain ? `help.${tenantData.domain}` : "help.example.com"}
+                          value={subdomainInput}
+                          onChange={(e) => setSubdomainInput(e.target.value)}
+                          disabled={isSavingSubdomain || isRemovingSubdomain}
+                          className="flex-1"
+                        />
+                        {subdomain ? (
+                          <>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={async () => {
+                                setIsSavingSubdomain(true);
+                                try {
+                                  const response = await fetch(
+                                    `/api/tenants/${session?.user.tenantId}/subdomain`,
+                                    {
+                                      method: "POST",
+                                      headers: { "Content-Type": "application/json" },
+                                      body: JSON.stringify({ subdomain: subdomainInput }),
+                                    }
+                                  );
+                                  if (!response.ok) {
+                                    const data = await response.json();
+                                    throw new Error(data.error || "Failed to save subdomain");
+                                  }
+                                  const data = await response.json();
+                                  setSubdomain(data.subdomain);
+                                  setSubdomainInput(data.subdomain);
+                                  setSubdomainVerified(data.verified || false);
+                                  setSubdomainVerificationToken(data.verificationToken || null);
+                                  toast.success("Subdomain updated successfully. Please verify DNS to activate it.");
+                                } catch (error: any) {
+                                  toast.error(error.message);
+                                } finally {
+                                  setIsSavingSubdomain(false);
+                                }
+                              }}
+                              disabled={isSavingSubdomain || subdomainInput === subdomain}
+                            >
+                              {isSavingSubdomain ? (
+                                <>
+                                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                  Saving...
+                                </>
+                              ) : (
+                                "Update"
+                              )}
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={async () => {
+                                setIsRemovingSubdomain(true);
+                                try {
+                                  const response = await fetch(
+                                    `/api/tenants/${session?.user.tenantId}/subdomain`,
+                                    {
+                                      method: "DELETE",
+                                    }
+                                  );
+                                  if (!response.ok) {
+                                    const data = await response.json();
+                                    throw new Error(data.error || "Failed to remove subdomain");
+                                  }
+                                  setSubdomain(null);
+                                  setSubdomainInput("");
+                                  setSubdomainVerified(false);
+                                  setSubdomainVerificationToken(null);
+                                  toast.success("Subdomain removed successfully");
+                                } catch (error: any) {
+                                  toast.error(error.message);
+                                } finally {
+                                  setIsRemovingSubdomain(false);
+                                }
+                              }}
+                              disabled={isRemovingSubdomain}
+                              className="border-red-200 text-red-600 hover:bg-red-100"
+                            >
+                              {isRemovingSubdomain ? (
+                                <>
+                                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                  Removing...
+                                </>
+                              ) : (
+                                "Remove"
+                              )}
+                            </Button>
+                          </>
+                        ) : (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={async () => {
+                              setIsSavingSubdomain(true);
+                              try {
+                                const response = await fetch(
+                                  `/api/tenants/${session?.user.tenantId}/subdomain`,
+                                  {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ subdomain: subdomainInput }),
+                                  }
+                                );
+                                if (!response.ok) {
+                                  const data = await response.json();
+                                  throw new Error(data.error || "Failed to set subdomain");
+                                }
+                                const data = await response.json();
+                                setSubdomain(data.subdomain);
+                                setSubdomainInput(data.subdomain);
+                                setSubdomainVerified(data.verified || false);
+                                setSubdomainVerificationToken(data.verificationToken || null);
+                                toast.success("Subdomain set successfully. Please verify DNS to activate it.");
+                              } catch (error: any) {
+                                toast.error(error.message);
+                              } finally {
+                                setIsSavingSubdomain(false);
+                              }
+                            }}
+                            disabled={isSavingSubdomain || !subdomainInput.trim()}
+                          >
+                            {isSavingSubdomain ? (
+                              <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Setting...
+                              </>
+                            ) : (
+                              "Set"
+                            )}
+                          </Button>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Full subdomain (e.g., {tenantData?.domain ? `help.${tenantData.domain}` : "help.example.com"}). Users can access your organization via this domain.
+                      </p>
+                      {subdomain && !subdomainVerified && subdomainVerificationToken && (
+                        <div className="mt-3 p-3 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-900 rounded-md">
+                          <p className="text-xs font-medium text-yellow-800 dark:text-yellow-300 mb-2">
+                            DNS Verification Required
+                          </p>
+                          <p className="text-xs text-yellow-700 dark:text-yellow-400 mb-2">
+                            Add the following TXT record to your DNS:
+                          </p>
+                          <div className="bg-white dark:bg-neutral-900 p-2 rounded border border-yellow-300 dark:border-yellow-800 mb-2">
+                            <p className="text-xs font-mono text-yellow-900 dark:text-yellow-200">
+                              Host: <strong>_onpoints-verify.{subdomain.split('.').slice(-2).join('.')}</strong>
+                            </p>
+                            <p className="text-xs font-mono text-yellow-900 dark:text-yellow-200 break-all">
+                              Value: <strong>{subdomainVerificationToken}</strong>
+                            </p>
+                          </div>
+                          <p className="text-xs text-yellow-700 dark:text-yellow-400 mb-2">
+                            After adding the DNS record, wait a few minutes for propagation, then click "Verify DNS".
+                          </p>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={async () => {
+                              setIsVerifyingSubdomain(true);
+                              try {
+                                const response = await fetch(
+                                  `/api/tenants/${session?.user.tenantId}/subdomain/verify`,
+                                  {
+                                    method: "PUT",
+                                  }
+                                );
+                                if (!response.ok) {
+                                  const data = await response.json();
+                                  throw new Error(data.error || "DNS verification failed");
+                                }
+                                const data = await response.json();
+                                if (data.verified) {
+                                  setSubdomainVerified(true);
+                                  toast.success("DNS verified successfully! Subdomain is now active.");
+                                } else {
+                                  toast.error("DNS verification failed. Please check your DNS settings.");
+                                }
+                              } catch (error: any) {
+                                toast.error(error.message || "DNS verification failed");
+                              } finally {
+                                setIsVerifyingSubdomain(false);
+                              }
+                            }}
+                            disabled={isVerifyingSubdomain}
+                            className="border-yellow-300 text-yellow-700 hover:bg-yellow-100 dark:border-yellow-800 dark:text-yellow-300 dark:hover:bg-yellow-900/30"
+                          >
+                            {isVerifyingSubdomain ? (
+                              <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Verifying...
+                              </>
+                            ) : (
+                              "Verify DNS"
+                            )}
+                          </Button>
+                        </div>
+                      )}
+                      {subdomain && subdomainVerified && (
+                        <div className="mt-2 p-2 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900 rounded-md">
+                          <p className="text-xs text-green-700 dark:text-green-300">
+                            ✅ Verified: {subdomain} is active and ready to use
+                          </p>
+                        </div>
+                      )}
                     </div>
 
                     <div className="space-y-2">

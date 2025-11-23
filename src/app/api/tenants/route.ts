@@ -28,6 +28,7 @@ export async function GET() {
           slug: string;
           domain: string | null;
           createdAt: Date;
+          settings: any;
           users_count: bigint;
           tickets_count: bigint;
           group_id: string | null;
@@ -39,6 +40,7 @@ export async function GET() {
             t.slug, 
             t.domain, 
             t."createdAt",
+            t.settings,
             (SELECT COUNT(*) FROM users WHERE "tenantId" = t.id) as users_count,
             (SELECT COUNT(*) FROM tickets WHERE "tenantId" = t.id) as tickets_count,
             tg.id as group_id,
@@ -57,6 +59,7 @@ export async function GET() {
           slug: t.slug,
           domain: t.domain,
           createdAt: t.createdAt,
+          settings: t.settings || {},
           _count: {
             users: Number(t.users_count) || 0,
             tickets: Number(t.tickets_count) || 0,

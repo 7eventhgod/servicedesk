@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
-import { createAuditLog } from "@/lib/audit-log";
+import { createAuditLog, getClientIp, getUserAgent } from "@/lib/audit-log";
 import { getTenantWhereClause, getTenantIdForCreate } from "@/lib/api-utils";
 
 const assetSchema = z.object({
@@ -116,7 +116,8 @@ export async function POST(request: Request) {
       resourceType: "ASSET",
       resourceId: asset.id,
       metadata: { name: asset.name, type: asset.type },
-      request,
+      ipAddress: getClientIp(request),
+      userAgent: getUserAgent(request),
     });
 
     return NextResponse.json(asset, { status: 201 });

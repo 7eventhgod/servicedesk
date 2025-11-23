@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
       RETURNING id, name, description, "createdAt", "updatedAt"
     `;
 
-    const group = result[0];
+    const group = (result as any[])[0];
 
     return NextResponse.json(group, { status: 201 });
   } catch (error: any) {

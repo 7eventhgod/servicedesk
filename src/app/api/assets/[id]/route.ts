@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
-import { createAuditLog } from "@/lib/audit-log";
+import { createAuditLog, getClientIp, getUserAgent } from "@/lib/audit-log";
 
 const updateAssetSchema = z.object({
   name: z.string().min(1).optional(),
@@ -119,7 +119,8 @@ export async function PATCH(
       resourceType: "ASSET",
       resourceId: updatedAsset.id,
       metadata: { name: updatedAsset.name },
-      request,
+      ipAddress: getClientIp(request),
+      userAgent: getUserAgent(request),
     });
 
     return NextResponse.json(updatedAsset);
@@ -170,7 +171,8 @@ export async function DELETE(
       resourceType: "ASSET",
       resourceId: asset.id,
       metadata: { name: asset.name },
-      request,
+      ipAddress: getClientIp(request),
+      userAgent: getUserAgent(request),
     });
 
     return NextResponse.json({ success: true });
