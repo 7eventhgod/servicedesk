@@ -131,7 +131,7 @@ export default function AgentsPage() {
       const response = await fetch(`/api/agents/${agentId}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ agentStatus: newStatus }),
+        body: JSON.stringify({ status: newStatus }), // API expects 'status', not 'agentStatus'
       });
 
       if (!response.ok) {

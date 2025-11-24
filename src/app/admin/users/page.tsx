@@ -188,11 +188,11 @@ export default function AdminUsersPage() {
   return (
     <div className="space-y-6 p-6">
       <div>
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent flex items-center gap-3">
-          <Users className="h-8 w-8 text-green-600" />
+        <h1 className="text-3xl font-bold text-neutral-100 flex items-center gap-3">
+          <Users className="h-8 w-8 text-green-500" />
           Organization Administrators
         </h1>
-        <p className="text-muted-foreground mt-2">
+        <p className="text-neutral-400 mt-2">
           Manage tenant administrators (TENANT_ADMIN)
         </p>
       </div>
@@ -201,7 +201,7 @@ export default function AdminUsersPage() {
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardTitle className="text-sm font-medium text-neutral-400">
               Total Administrators
             </CardTitle>
           </CardHeader>
@@ -211,24 +211,24 @@ export default function AdminUsersPage() {
         </Card>
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardTitle className="text-sm font-medium text-neutral-400">
               Active
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-2xl font-bold text-green-500">
               {users.filter(u => u.isActive).length}
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardTitle className="text-sm font-medium text-neutral-400">
               Organizations
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
+            <div className="text-2xl font-bold text-blue-500">
               {new Set(users.map(u => u.tenantId).filter(Boolean)).size}
             </div>
           </CardContent>
@@ -237,7 +237,7 @@ export default function AdminUsersPage() {
 
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
         <Input
           placeholder="Search by email, name or organization..."
           value={searchQuery}
@@ -249,28 +249,28 @@ export default function AdminUsersPage() {
       {/* Users List */}
       <div className="space-y-3">
         {filteredUsers.map(user => (
-          <Card key={user.id} className={`border-2 ${!user.isActive ? "opacity-60 bg-slate-50" : ""}`}>
+          <Card key={user.id} className={`${!user.isActive ? "opacity-60" : ""}`}>
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4 flex-1">
                   <div className={`p-3 rounded-full ${
-                    user.role === "ADMIN" ? "bg-red-100" :
-                    user.role === "TENANT_ADMIN" ? "bg-blue-100" :
-                    user.role === "AGENT" ? "bg-green-100" : "bg-slate-100"
+                    user.role === "ADMIN" ? "bg-red-900/50" :
+                    user.role === "TENANT_ADMIN" ? "bg-blue-900/50" :
+                    user.role === "AGENT" ? "bg-green-900/50" : "bg-neutral-800"
                   }`}>
                     <Shield className={`h-5 w-5 ${
-                      user.role === "ADMIN" ? "text-red-600" :
-                      user.role === "TENANT_ADMIN" ? "text-blue-600" :
-                      user.role === "AGENT" ? "text-green-600" : "text-slate-600"
+                      user.role === "ADMIN" ? "text-red-400" :
+                      user.role === "TENANT_ADMIN" ? "text-blue-400" :
+                      user.role === "AGENT" ? "text-green-400" : "text-neutral-400"
                     }`} />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold">{user.name || "No name"}</h3>
+                      <h3 className="font-semibold text-neutral-100">{user.name || "No name"}</h3>
                       {getRoleBadge(user.role)}
                       {!user.isActive && <Badge variant="destructive">Inactive</Badge>}
                     </div>
-                    <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-3 text-sm text-neutral-400">
                       <span>{user.email}</span>
                       {user.tenant && (
                         <>
@@ -325,9 +325,9 @@ export default function AdminUsersPage() {
         {filteredUsers.length === 0 && (
           <Card>
             <CardContent className="py-12 text-center">
-              <Users className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+              <Users className="mx-auto h-12 w-12 text-neutral-600 mb-4" />
               <h3 className="text-lg font-semibold mb-2">No users found</h3>
-              <p className="text-muted-foreground">
+              <p className="text-neutral-400">
                 {searchQuery ? "Try changing your search query" : "No users in the system"}
               </p>
             </CardContent>

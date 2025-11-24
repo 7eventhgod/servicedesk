@@ -7,6 +7,12 @@ export default withAuth(
     const path = req.nextUrl.pathname;
     const hostname = req.headers.get("host") || "";
 
+    // CRITICAL: Block deactivated users immediately
+    if (token && token.isActive === false) {
+      // Force logout by redirecting to login with deactivation message
+      return NextResponse.redirect(new URL("/login?error=account-deactivated", req.url));
+    }
+
     // Определяем тенанта по домену и добавляем заголовки для дальнейшего использования
     const requestHeaders = new Headers(req.headers);
     
@@ -49,6 +55,11 @@ export default withAuth(
         // Public pages (including homepage)
         if (path === "/" || path === "/login" || path === "/register") {
           return true;
+        }
+
+        // Block deactivated users
+        if (token && token.isActive === false) {
+          return false;
         }
 
         // API routes for support tickets

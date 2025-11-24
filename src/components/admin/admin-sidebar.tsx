@@ -141,12 +141,12 @@ export function AdminSidebar({ mobileMenuOpen = false, onClose }: AdminSidebarPr
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex lg:flex-col w-56 border-r border-neutral-900 min-h-[calc(100vh-4rem)] bg-neutral-950">
+      <aside className="hidden lg:flex lg:flex-col w-56 border-r border-neutral-800 min-h-[calc(100vh-4rem)] bg-neutral-950">
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
           {/* Admin Menu */}
           <div className="mb-6">
             <div className="px-3 py-2 mb-3">
-              <div className="h-px w-full bg-gradient-to-r from-green-500 via-neutral-800 to-transparent"></div>
+              <div className="h-px w-full bg-gradient-to-r from-green-500 via-neutral-700 to-transparent"></div>
             </div>
             {adminMenuItems.map((item) => {
               const Icon = item.icon;
@@ -159,8 +159,8 @@ export function AdminSidebar({ mobileMenuOpen = false, onClose }: AdminSidebarPr
                   className={cn(
                     "flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-150 relative group",
                     isActive
-                      ? "bg-neutral-900 text-white font-bold border border-neutral-800"
-                      : "text-neutral-500 hover:bg-neutral-900 hover:text-white font-medium border border-transparent hover:border-neutral-800"
+                      ? "bg-neutral-900 text-white font-bold border border-neutral-700"
+                      : "text-neutral-300 hover:bg-neutral-900 hover:text-white font-medium border border-transparent hover:border-neutral-700"
                   )}
                 >
                   <Icon className="h-4 w-4" />
@@ -190,9 +190,9 @@ export function AdminSidebar({ mobileMenuOpen = false, onClose }: AdminSidebarPr
           </div>
 
           {/* Global Modules */}
-          <div className="pt-3 border-t border-neutral-900">
+          <div className="pt-3 border-t border-neutral-800">
             <div className="px-3 py-2 mb-3">
-              <span className="text-[10px] font-mono font-bold text-neutral-600 uppercase tracking-[0.3em]">
+              <span className="text-[10px] font-mono font-bold text-neutral-400 uppercase tracking-[0.3em]">
                 GLOBAL
               </span>
             </div>
@@ -207,8 +207,8 @@ export function AdminSidebar({ mobileMenuOpen = false, onClose }: AdminSidebarPr
                   className={cn(
                     "flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-150 relative group",
                     isActive
-                      ? "bg-neutral-900 text-white font-bold border border-neutral-800"
-                      : "text-neutral-500 hover:bg-neutral-900 hover:text-white font-medium border border-transparent hover:border-neutral-800"
+                      ? "bg-neutral-900 text-white font-bold border border-neutral-700"
+                      : "text-neutral-300 hover:bg-neutral-900 hover:text-white font-medium border border-transparent hover:border-neutral-700"
                   )}
                 >
                   <Icon className="h-4 w-4" />
@@ -224,7 +224,7 @@ export function AdminSidebar({ mobileMenuOpen = false, onClose }: AdminSidebarPr
         </nav>
 
         {/* Admin Info - Absolute at bottom */}
-        <div className="p-3 border-t border-neutral-900 bg-neutral-950 space-y-2">
+        <div className="p-3 border-t border-neutral-800 bg-neutral-950 space-y-2">
           <div className="px-3 py-2 rounded-lg border border-neutral-900 bg-neutral-950/50">
             <div className="flex items-center gap-2 mb-2">
               <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
@@ -232,14 +232,14 @@ export function AdminSidebar({ mobileMenuOpen = false, onClose }: AdminSidebarPr
                 ROOT
               </span>
             </div>
-            <p className="text-[10px] text-neutral-600 font-mono">
+            <p className="text-[10px] text-neutral-400 font-mono">
               Full system access
             </p>
           </div>
           
           <button
             onClick={() => router.push("/dashboard")}
-            className="w-full px-3 py-2 rounded-lg border border-neutral-800 bg-neutral-950/50 hover:bg-neutral-900 hover:border-neutral-700 transition-all duration-150 text-neutral-400 hover:text-white group"
+            className="w-full px-3 py-2 rounded-lg border border-neutral-800 bg-neutral-900/50 hover:bg-neutral-900 hover:border-neutral-600 transition-all duration-150 text-neutral-300 hover:text-white group"
           >
             <div className="flex items-center gap-2">
               <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
@@ -252,12 +252,12 @@ export function AdminSidebar({ mobileMenuOpen = false, onClose }: AdminSidebarPr
       {/* Mobile sidebar */}
       <aside 
         className={cn(
-          "lg:hidden fixed top-0 left-0 z-50 h-full w-64 bg-neutral-950 border-r border-neutral-900 transition-transform duration-300",
+          "lg:hidden fixed top-0 left-0 z-50 h-full w-64 bg-neutral-950 border-r border-neutral-800 transition-transform duration-300",
           mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         <div className="flex flex-col h-full">
-          <div className="flex items-center justify-between p-4 border-b border-neutral-900">
+          <div className="flex items-center justify-between p-4 border-b border-neutral-800">
             <h2 className="text-sm font-bold font-mono text-white">./ADMIN</h2>
           </div>
           
@@ -275,7 +275,7 @@ export function AdminSidebar({ mobileMenuOpen = false, onClose }: AdminSidebarPr
                     "flex items-center gap-3 px-3 py-2 rounded-lg transition-all",
                     isActive
                       ? "bg-neutral-900 text-white font-bold"
-                      : "text-neutral-500 hover:bg-neutral-900 hover:text-white"
+                      : "text-neutral-300 hover:bg-neutral-900 hover:text-white"
                   )}
                 >
                   <Icon className="h-4 w-4" />

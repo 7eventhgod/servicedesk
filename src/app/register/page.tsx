@@ -12,7 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Loader2, Building2, RefreshCw, Eye, EyeOff, Shield } from "lucide-react";
+import { Loader2, Building2, RefreshCw, Eye, EyeOff, Shield, CheckCircle, Copy } from "lucide-react";
 import Link from "next/link";
 
 export default function RegisterPage() {
@@ -22,6 +22,8 @@ export default function RegisterPage() {
   const [step, setStep] = useState(1);
   const [showPassword, setShowPassword] = useState(false);
   const [generatedPassword, setGeneratedPassword] = useState("");
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [registeredCredentials, setRegisteredCredentials] = useState({ email: "", password: "" });
   const [formData, setFormData] = useState({
     tenantName: "",
     tenantSlug: "",
@@ -96,8 +98,8 @@ export default function RegisterPage() {
         throw new Error(data.error || "Failed to create organization");
       }
 
-      alert(`Organization successfully created!\n\nYour login credentials:\nEmail: ${formData.email}\nPassword: ${formData.password}\n\nPlease save these credentials!`);
-      router.push("/login?message=registration-success");
+      setRegisteredCredentials({ email: formData.email, password: formData.password });
+      setShowSuccessDialog(true);
     } catch (error: any) {
       setError(error.message);
     } finally {
@@ -369,6 +371,100 @@ export default function RegisterPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Success Credential Dialog */}
+      {showSuccessDialog && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+            {/* Success Header */}
+            <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-6 text-white">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="rounded-full bg-white/20 p-2">
+                  <CheckCircle className="h-8 w-8" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold">Organization Created!</h3>
+                  <p className="text-green-50 text-sm">Your account has been successfully registered</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Credentials Content */}
+            <div className="p-6 space-y-6">
+              <div className="bg-yellow-50 dark:bg-yellow-900/20 border-2 border-yellow-400 dark:border-yellow-600 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <Shield className="h-5 w-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-yellow-800 dark:text-yellow-200 mb-1">
+                      Important: Save Your Credentials
+                    </h4>
+                    <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                      Please copy and securely store these credentials. You'll need them to log in.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Email */}
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Email Address</Label>
+                <div className="flex gap-2">
+                  <Input
+                    value={registeredCredentials.email}
+                    readOnly
+                    className="font-mono text-sm bg-slate-50 dark:bg-slate-800"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      navigator.clipboard.writeText(registeredCredentials.email);
+                    }}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+
+              {/* Password */}
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Password</Label>
+                <div className="flex gap-2">
+                  <Input
+                    value={registeredCredentials.password}
+                    readOnly
+                    className="font-mono text-sm bg-slate-50 dark:bg-slate-800"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      navigator.clipboard.writeText(registeredCredentials.password);
+                    }}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+
+              {/* Action Button */}
+              <div className="flex gap-3 pt-4">
+                <Button
+                  className="flex-1 h-12 font-bold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg"
+                  onClick={() => {
+                    setShowSuccessDialog(false);
+                    router.push("/login?message=registration-success");
+                  }}
+                >
+                  Go to Login
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -13,8 +13,10 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ArrowLeft, Plus, UserCheck, UserX, Ticket, Users } from "lucide-react";
+import { ArrowLeft, Plus, UserCheck, UserX, Ticket, Users, Edit } from "lucide-react";
 import { formatDate, getInitials } from "@/lib/utils";
+import { EditUserDialog } from "@/components/users/edit-user-dialog";
+import { toast } from "sonner";
 
 interface User {
   id: string;
@@ -52,6 +54,29 @@ export default function TenantUsersPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [tenantName, setTenantName] = useState("");
 
+  const fetchUsers = async () => {
+    setIsLoading(true);
+    try {
+      // Get organization data
+      const tenantResponse = await fetch(`/api/tenants/${params.id}`);
+      if (tenantResponse.ok) {
+        const tenant = await tenantResponse.json();
+        setTenantName(tenant.name);
+      }
+
+      // Get organization users
+      const usersResponse = await fetch(`/api/tenants/${params.id}/users`);
+      if (!usersResponse.ok) throw new Error("Failed to fetch users");
+      const data = await usersResponse.json();
+      setUsers(data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      toast.error("Failed to load users");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Check that user is admin or tenant admin
   useEffect(() => {
     if (status === "loading") return; // Wait for session load
@@ -63,29 +88,8 @@ export default function TenantUsersPage() {
   }, [session, status, router]);
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        // Get organization data
-        const tenantResponse = await fetch(`/api/tenants/${params.id}`);
-        if (tenantResponse.ok) {
-          const tenant = await tenantResponse.json();
-          setTenantName(tenant.name);
-        }
-
-        // Get organization users
-        const usersResponse = await fetch(`/api/tenants/${params.id}/users`);
-        if (!usersResponse.ok) throw new Error("Failed to fetch users");
-        const data = await usersResponse.json();
-        setUsers(data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
     if (params.id) {
-      fetchData();
+      fetchUsers();
     }
   }, [params.id]);
 
@@ -210,12 +214,12 @@ export default function TenantUsersPage() {
                   </div>
                 </div>
                 <div className="mt-4 flex gap-2">
-                  <Button variant="outline" size="sm" className="flex-1">
-                    Edit
-                  </Button>
-                  <Button variant="outline" size="sm" className="flex-1">
-                    Profile
-                  </Button>
+                  <EditUserDialog user={user as any} onUserUpdated={fetchUsers}>
+                    <Button variant="outline" size="sm" className="flex-1">
+                      <Edit className="mr-1 h-3 w-3" />
+                      Edit
+                    </Button>
+                  </EditUserDialog>
                 </div>
               </CardContent>
             </Card>

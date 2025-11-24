@@ -315,10 +315,9 @@ export function DashboardSidebar({ mobileMenuOpen = false, onClose }: DashboardS
       return false;
     }
 
-    // Filter out all superAdmin items - they are now in admin panel only
-    if (item.superAdmin) {
-      return false;
-    }
+    // IMPORTANT: Don't filter superAdmin items - show them to super admins
+    // Super admins need quick access to Organizations and other admin features
+    // The check is done via role already, so no need to hide them
 
     // Billing available only for TENANT_ADMIN with tenantId
     if (item.href === "/dashboard/billing") {

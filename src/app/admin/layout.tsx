@@ -14,17 +14,17 @@ export default function AdminLayout({
 
   return (
     <SessionProvider>
-      <div className="min-h-screen bg-black">
+      <div className="min-h-screen bg-neutral-950 admin-dark-theme">
         <DashboardHeader 
           onMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)} 
           mobileMenuOpen={mobileMenuOpen}
         />
-        <div className="flex border-t border-neutral-900">
+        <div className="flex border-t border-neutral-800">
           <AdminSidebar 
             mobileMenuOpen={mobileMenuOpen}
             onClose={() => setMobileMenuOpen(false)}
           />
-          <main className="flex-1">
+          <main className="flex-1 p-4 sm:p-6 lg:p-8 w-full overflow-x-hidden bg-neutral-950 text-neutral-100">
             {children}
           </main>
         </div>

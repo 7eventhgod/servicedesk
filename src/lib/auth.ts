@@ -57,15 +57,16 @@ export const authOptions: NextAuthOptions = {
           );
 
           if (isPasswordValid) {
-            return {
-              id: user.id,
-              email: user.email,
-              name: user.name,
-              role: user.role,
-              tenantId: user.tenantId,
-              tenantSlug: user.tenant?.slug || null,
-              permissions: user.permissions,
-            };
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+            isActive: user.isActive,
+            tenantId: user.tenantId,
+            tenantSlug: user.tenant?.slug || null,
+            permissions: user.permissions,
+          };
           }
         }
 
@@ -119,6 +120,7 @@ export const authOptions: NextAuthOptions = {
             email: ldapUser.email,
             name: ldapUser.name,
             role: ldapUser.role,
+            isActive: ldapUser.isActive,
             tenantId: ldapUser.tenantId,
             tenantSlug: ldapUser.tenant?.slug || null,
             permissions: ldapUser.permissions,
@@ -227,18 +229,20 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.role = user.role;
+        token.isActive = user.isActive;
         token.tenantId = user.tenantId;
         token.tenantSlug = user.tenantSlug;
         token.permissions = user.permissions;
       }
 
-      // For OAuth providers, fetch data from database
+      // For OAuth providers and session refresh, fetch latest user data from database
       if (account && (account.provider === "google" || account.provider === "azure-ad")) {
         const dbUser = await prisma.user.findUnique({
           where: { email: token.email as string },
           select: {
             id: true,
             role: true,
+            isActive: true,
             tenantId: true,
             permissions: true,
             tenant: { select: { slug: true } },
@@ -248,8 +252,27 @@ export const authOptions: NextAuthOptions = {
         if (dbUser) {
           token.id = dbUser.id;
           token.role = dbUser.role;
+          token.isActive = dbUser.isActive;
           token.tenantId = dbUser.tenantId;
           token.tenantSlug = dbUser.tenant?.slug || null;
+          token.permissions = dbUser.permissions;
+        }
+      }
+
+      // Refresh user data on every request to catch deactivation
+      if (token.id) {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: {
+            isActive: true,
+            role: true,
+            permissions: true,
+          },
+        });
+
+        if (dbUser) {
+          token.isActive = dbUser.isActive;
+          token.role = dbUser.role;
           token.permissions = dbUser.permissions;
         }
       }
@@ -260,6 +283,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role;
+        session.user.isActive = token.isActive as boolean;
         session.user.tenantId = token.tenantId as string;
         session.user.tenantSlug = token.tenantSlug as string;
         session.user.permissions = token.permissions as any;

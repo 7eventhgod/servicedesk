@@ -29,7 +29,9 @@ export async function GET(
     }
 
     // Check that user requests users of their organization
-    if (session.user.tenantId !== params.id) {
+    // Super admin (ADMIN without tenantId) can access all tenants
+    const isSuperAdmin = session.user.role === "ADMIN" && !session.user.tenantId;
+    if (!isSuperAdmin && session.user.tenantId !== params.id) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

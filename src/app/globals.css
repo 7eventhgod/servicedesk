@@ -260,3 +260,36 @@
   }
 }
 
+/* Admin Panel Dark Theme Override */
+@layer components {
+  /* Force dark theme for admin panel cards and components */
+  .admin-dark-theme {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 8%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 8%;
+    --popover-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --border: 217.2 32.6% 20%;
+    --input: 217.2 32.6% 17.5%;
+  }
+  
+  /* Apply to all cards in admin-dark-theme */
+  .admin-dark-theme [data-slot="card"],
+  .admin-dark-theme .card {
+    @apply bg-neutral-900 border-neutral-800 text-neutral-100;
+  }
+  
+  .admin-dark-theme input,
+  .admin-dark-theme textarea {
+    @apply bg-neutral-900 border-neutral-800 text-neutral-100;
+  }
+  
+  .admin-dark-theme input::placeholder,
+  .admin-dark-theme textarea::placeholder {
+    @apply text-neutral-500;
+  }
+}
+
