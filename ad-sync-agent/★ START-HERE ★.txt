@@ -1,0 +1,74 @@
+================================================================
+      ServiceDesk AD Sync Agent - START HERE
+================================================================
+
+🚀 EASIEST WAY (Recommended):
+
+   1. Double-click:  EASY-SETUP.bat
+   2. Follow the wizard (3 simple steps)
+   3. Done!
+
+================================================================
+
+📖 GUIDES:
+
+   TESTING-GUIDE.md
+   → Test locally first (no internet needed!)
+   → Mock data examples
+   → Development workflow
+
+   COMPLETE-SETUP-GUIDE.md
+   → Production setup instructions
+   → Troubleshooting for common issues
+   → Configuration reference
+   → Security best practices
+
+================================================================
+
+⚡ QUICK SETUP SUMMARY:
+
+   STEP 1: Web Interface (ServiceDesk)
+   ────────────────────────────────────
+   • Go to: Settings → AD Sync
+   • Click: Generate API Key
+   • Copy: API Key and Tenant ID
+
+   STEP 2: Run Wizard (This Computer)
+   ────────────────────────────────────
+   • Double-click: EASY-SETUP.bat
+   • Enter: AD server, domain, credentials
+   • Enter: ServiceDesk URL, Tenant ID, API Key
+   • Start: Agent begins syncing
+
+   STEP 3: Verify
+   ────────────────────────────────────
+   • Check: Users appear in ServiceDesk
+   • Test: Log in with AD credentials
+   • Done: Auto-sync every hour ✓
+
+================================================================
+
+❓ NEED HELP?
+
+   Common issues and solutions:
+   • WHERE-TO-GET-API-KEY.md  → How to get credentials
+   • COMPLETE-SETUP-GUIDE.md  → Full troubleshooting
+   • ad_sync.log              → Check error logs
+
+================================================================
+
+📋 FILES YOU NEED:
+
+   ✓ EASY-SETUP.bat              ← Start here!
+   ✓ TESTING-GUIDE.md            ← Test locally first!
+   ✓ COMPLETE-SETUP-GUIDE.md     ← Full documentation
+   ✓ WHERE-TO-GET-API-KEY.md     ← Find your credentials
+   ✓ .env.example                ← Configuration template
+   ✓ ad_sync_agent.py            ← The sync program
+
+================================================================
+
+Total setup time: 5-10 minutes
+Questions? Read COMPLETE-SETUP-GUIDE.md first!
+
+================================================================

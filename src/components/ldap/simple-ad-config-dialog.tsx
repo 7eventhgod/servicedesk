@@ -37,6 +37,9 @@ export function SimpleADConfigDialog({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isTesting, setIsTesting] = useState(false);
   const [testSuccess, setTestSuccess] = useState(false);
+  const [importUsersAfterSave, setImportUsersAfterSave] = useState(true);
+  const [createdConfigId, setCreatedConfigId] = useState<string | null>(null);
+  const [isSyncing, setIsSyncing] = useState(false);
 
   // Simple fields
   const [name, setName] = useState("");
@@ -143,9 +146,43 @@ export function SimpleADConfigDialog({
         throw new Error(error.message || "Failed to create connection");
       }
 
+      const result = await response.json();
+      const configId = result.id;
+
       toast.success("Active Directory connected!", {
-        description: "Users can sign in using domain credentials",
+        description: "Connection saved successfully",
       });
+
+      // If user wants to import users immediately
+      if (importUsersAfterSave && configId) {
+        setCreatedConfigId(configId);
+        setIsSyncing(true);
+        
+        try {
+          const syncResponse = await fetch(`/api/ldap/${configId}/sync`, {
+            method: "POST",
+          });
+
+          if (syncResponse.ok) {
+            const syncResult = await syncResponse.json();
+            toast.success("Users imported successfully!", {
+              description: `✓ Found: ${syncResult.usersFound} | Created: ${syncResult.usersCreated} | Updated: ${syncResult.usersUpdated}`,
+              duration: 6000,
+            });
+          } else {
+            const error = await syncResponse.json();
+            toast.error("Import failed", {
+              description: error.error || "Failed to import users. You can try again from the connection list.",
+            });
+          }
+        } catch (error: any) {
+          toast.error("Import error", {
+            description: error.message,
+          });
+        } finally {
+          setIsSyncing(false);
+        }
+      }
 
       // Reset form
       setName("");
@@ -155,6 +192,8 @@ export function SimpleADConfigDialog({
       setAdminPassword("");
       setIsActive(false);
       setTestSuccess(false);
+      setImportUsersAfterSave(true);
+      setCreatedConfigId(null);
       setIsOpen(false);
 
       onConfigCreated?.();
@@ -182,6 +221,16 @@ export function SimpleADConfigDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6 py-4">
+          {/* Network requirement warning */}
+          <Alert variant="default" className="bg-amber-50 dark:bg-amber-950 border-amber-200 dark:border-amber-800">
+            <AlertTriangle className="h-4 w-4 text-amber-600" />
+            <AlertDescription>
+              <strong>Network Requirement:</strong> This direct connection only works if ServiceDesk can reach your AD server.
+              If you're using <strong>cloud-hosted ServiceDesk</strong> with <strong>on-premise AD</strong>,
+              please use the <a href="/dashboard/settings/ad-sync" className="underline font-medium">On-Premise Agent</a> instead.
+            </AlertDescription>
+          </Alert>
+
           {/* Info block */}
           <Alert>
             <Info className="h-4 w-4" />
@@ -290,6 +339,23 @@ export function SimpleADConfigDialog({
                   onCheckedChange={setIsActive}
                 />
               </div>
+
+              <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <div className="flex-1">
+                  <Label htmlFor="importUsers" className="text-sm font-medium flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-blue-600" />
+                    Import Users After Saving
+                  </Label>
+                  <p className="text-xs text-muted-foreground">
+                    Automatically import all users from AD right after connection is created
+                  </p>
+                </div>
+                <Switch
+                  id="importUsers"
+                  checked={importUsersAfterSave}
+                  onCheckedChange={setImportUsersAfterSave}
+                />
+              </div>
             </CardContent>
           </Card>
 
@@ -378,22 +444,39 @@ export function SimpleADConfigDialog({
 
             <Button
               type="submit"
-              disabled={isSubmitting || isTesting}
+              disabled={isSubmitting || isTesting || isSyncing}
               className="flex-1"
             >
-              {isSubmitting ? (
+              {isSyncing ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Importing Users...
+                </>
+              ) : isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Saving...
                 </>
+              ) : importUsersAfterSave ? (
+                "Save & Import Users"
               ) : (
                 "Save"
               )}
             </Button>
           </div>
 
+          {importUsersAfterSave && (
+            <Alert className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
+              <Info className="h-4 w-4 text-blue-600" />
+              <AlertDescription className="text-xs">
+                <strong>Auto Import:</strong> After connection is saved, all users from your Active Directory will be automatically imported.
+                They can then immediately sign in using their Windows username and password.
+              </AlertDescription>
+            </Alert>
+          )}
+          
           <p className="text-xs text-muted-foreground text-center">
-            After saving, users will be able to sign in using domain username and password
+            Users can sign in using: <strong>domain\username</strong> or <strong>username@domain</strong>
           </p>
         </form>
       </DialogContent>

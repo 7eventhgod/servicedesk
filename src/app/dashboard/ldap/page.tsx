@@ -41,15 +41,60 @@ export default function LdapPage() {
           </Alert>
         )}
 
-        {/* Info card */}
+        {/* Network Setup Guide */}
         {!isGlobalAdmin && (
-          <Alert>
-            <Info className="h-4 w-4" />
-            <AlertDescription>
-              Connect Active Directory in 2 minutes! You only need the domain controller address, 
-              domain name and administrator credentials. All technical parameters are configured automatically.
-            </AlertDescription>
-          </Alert>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <Card className="border-2 border-blue-200 dark:border-blue-900">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-blue-600" />
+                  Direct Connection (This Page)
+                </CardTitle>
+                <CardDescription>
+                  Works when Service-Desk is on the same network as your AD
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-sm">Use this method if:</p>
+                <ul className="text-sm space-y-1 ml-4">
+                  <li>✓ Self-hosted ServiceDesk on your network</li>
+                  <li>✓ VPN connection between ServiceDesk and AD</li>
+                  <li>✓ Both on same LAN/datacenter</li>
+                </ul>
+                <p className="text-xs text-muted-foreground mt-3">
+                  <strong>Setup time:</strong> 2 minutes
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 border-green-200 dark:border-green-900">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Shield className="h-5 w-5 text-green-600" />
+                  On-Premise Agent (Recommended for Cloud)
+                </CardTitle>
+                <CardDescription>
+                  For cloud-hosted ServiceDesk connecting to on-premise AD
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-sm">Use this method if:</p>
+                <ul className="text-sm space-y-1 ml-4">
+                  <li>✓ ServiceDesk hosted in cloud/external network</li>
+                  <li>✓ AD is on-premise behind firewall</li>
+                  <li>✓ No VPN between cloud and AD</li>
+                </ul>
+                <p className="text-xs text-muted-foreground mt-3">
+                  <strong>Setup time:</strong> 5 minutes (install agent on AD network)
+                </p>
+                <Button variant="outline" size="sm" className="mt-2 w-full" asChild>
+                  <a href="/dashboard/settings/ad-sync" target="_blank">
+                    Setup On-Premise Agent →
+                  </a>
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         )}
 
         {/* Benefits */}
@@ -91,13 +136,22 @@ export default function LdapPage() {
         </Card>
 
         {/* Connection button */}
-        <div className="flex justify-end">
-          <SimpleADConfigDialog>
-            <Button size="lg" disabled={isGlobalAdmin}>
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Connect Domain
-            </Button>
-          </SimpleADConfigDialog>
+        <div className="flex flex-col gap-3">
+          <Alert>
+            <Info className="h-4 w-4" />
+            <AlertDescription className="text-sm">
+              <strong>Important:</strong> Direct connection only works if ServiceDesk can reach your AD server over the network.
+              If you're using cloud-hosted ServiceDesk with on-premise AD, use the <strong>On-Premise Agent</strong> method instead.
+            </AlertDescription>
+          </Alert>
+          <div className="flex justify-end">
+            <SimpleADConfigDialog>
+              <Button size="lg" disabled={isGlobalAdmin}>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Direct Connection Setup
+              </Button>
+            </SimpleADConfigDialog>
+          </div>
         </div>
 
         {/* Connections list */}
